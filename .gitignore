@@ -1,0 +1,22 @@
+# Visual Studio
+*.vcxproj.user
+.vs/
+Proyecto.e9deae40/
+
+# Compilados
+x64/
+Debug/
+Release/
+*.exe
+*.obj
+*.pdb
+*.ilk
+
+# Dependencias
+glm/
+include/
+lib/
+assimp-vc143-mt.dll
+glew32.dll
+glfw3.dll
+stb_image.h
