@@ -11,16 +11,13 @@ public:
 		return instance;
 	}
 
-	// Teclado
 	bool isKeyDown(int glfwKey) const { return keys[glfwKey]; }
 	bool isKeyPressed(int glfwKey) const { return keys[glfwKey] && !prevKeys[glfwKey]; }
 	bool isKeyReleased(int glfwKey) const { return !keys[glfwKey] && prevKeys[glfwKey]; }
 
-	// Mouse
 	float getMouseDeltaX() const { return mouseDeltaX; }
 	float getMouseDeltaY() const { return mouseDeltaY; }
 
-	// Capturar valores del mouse al inicio de cada frame
 	void beginFrame()
 	{
 		for (int i = 0; i < 1024; ++i) prevKeys[i] = keys[i];

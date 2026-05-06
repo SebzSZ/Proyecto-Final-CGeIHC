@@ -7,14 +7,11 @@ class Window
 {
 public:
 	Window(const char* title);
-
 	int Initialize();
 
-	// Getters del framebuffer
-	GLfloat getBufferWith() const { return (GLfloat)bufferWidth; }
+	GLfloat getBufferWidth() const { return (GLfloat)bufferWidth; }
 	GLfloat getBufferHeight() const { return (GLfloat)bufferHeight; }
 
-	// Métodos para el manejo de la ventana
 	bool shouldClose() const { return glfwWindowShouldClose(mainWindow); }
 	void swapBuffers() { glfwSwapBuffers(mainWindow); }
 
@@ -25,11 +22,11 @@ public:
 private:
 	GLFWwindow* mainWindow = nullptr;
 	const char* title;
-	GLint width, height;
+	GLint width = 0;
+	GLint height = 0;
 	GLint bufferWidth = 0;
 	GLint bufferHeight = 0;
 
-	// Callbacks
 	static void cbKeyboard(GLFWwindow* window, int key, int scancode, int action, int mods);
 	static void cbMousePos(GLFWwindow* window, double xPos, double yPos);
 

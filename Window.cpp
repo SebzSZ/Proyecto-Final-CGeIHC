@@ -1,6 +1,4 @@
-﻿#include <iostream>
-#include <stdio.h>
-#include "InputManager.h"
+﻿#include "InputManager.h"
 #include "Window.h"
 
 Window::Window(const char* title)
@@ -8,7 +6,7 @@ Window::Window(const char* title)
 {
 	if (!glfwInit())
 	{
-		std::cerr << "[Window] Error: No se pudo inicializar GLFW para detectar resolución.\n" << std::endl;
+		printf("[Window] Error: No se pudo inicializar GLFW.\n");
 		return;
 	}
 
@@ -25,7 +23,7 @@ int Window::Initialize()
 {
 	if (!glfwInit())
 	{
-		std::cerr << "[Window] Error: No se pudo inicializar GLFW.\n" << std::endl;
+		printf("[Window] Error: No se pudo inicializar GLFW.\n");
 		return -1;
 	}
 
@@ -40,7 +38,7 @@ int Window::Initialize()
 	mainWindow = glfwCreateWindow(width, height, title, monitor, nullptr);
 	if (!mainWindow)
 	{
-		std::cerr << "[Window] Error: No se pudo crear la ventana.\n" << std::endl;
+		printf("[Window] Error: No se pudo crear la ventana.\n");
 		glfwTerminate();
 		return -1;
 	}
@@ -58,7 +56,7 @@ int Window::Initialize()
 	glewExperimental = GL_TRUE;
 	if (glewInit() != GLEW_OK)
 	{
-		std::cerr << "[Window] Error: No se pudo inicializar GLEW.\n" << std::endl;
+		printf("[Window] Error: No se pudo inicializar GLEW.\n");
 		glfwDestroyWindow(mainWindow);
 		glfwTerminate();
 		return -1;
