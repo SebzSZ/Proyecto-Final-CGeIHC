@@ -20,3 +20,7 @@ assimp-vc143-mt.dll
 glew32.dll
 glfw3.dll
 stb_image.h
+
+# Modelos y texturas
+Models/
+Textures/
