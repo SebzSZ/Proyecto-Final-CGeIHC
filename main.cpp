@@ -4,6 +4,7 @@
 #include <gtc/matrix_transform.hpp>
 #include <gtc/type_ptr.hpp>
 
+#include "AudioManager.h"
 #include "Camera.h"
 #include "CommonValues.h"
 #include "DirectionalLight.h"
@@ -38,6 +39,12 @@ int main()
 	// Crear ventana
     Window mainWindow("Proyecto Final - CGeIHC");
     if (mainWindow.Initialize() != 0) return -1;
+
+	AudioManager& audioManager = AudioManager::getInstance();
+	if (!audioManager.Initialize()) return -1;
+
+	audioManager.loadMP3("bgMusic", "Sounds/bgMusic.mp3");
+	audioManager.play("bgMusic", true, 1.0f);
 
     // Configurar cámara
     Camera camera(glm::vec3(0.0f, 2.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, 0.0f, 5.0f, 0.1f);
@@ -197,6 +204,6 @@ int main()
         glUseProgram(0);
         mainWindow.swapBuffers();
     }
-
+    audioManager.shutdown();
     return 0;
 }
