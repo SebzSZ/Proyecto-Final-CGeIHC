@@ -17,6 +17,7 @@
 #include "SpotLight.h"
 #include "Texture.h"
 #include "Window.h"
+#include "GameObject.h"
 
 // Rutas de recursos
 static const char* VERT_SHADER = "shaders/shader.vert";
@@ -44,7 +45,7 @@ int main()
 	if (!audioManager.Initialize()) return -1;
 
 	audioManager.loadMP3("bgMusic", "Sounds/bgMusic.mp3");
-	audioManager.play("bgMusic", true, 1.0f);
+	audioManager.play("bgMusic", true, 0.5f);
 
     // Configurar cámara
     Camera camera(glm::vec3(0.0f, 2.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, 0.0f, 5.0f, 0.1f);
@@ -80,11 +81,37 @@ int main()
     Model nave;
     if (!nave.load("Models/nave.obj")) return -1;
 
-    Material matBrillante(1.0f, 32.0f);
+    // Ruby
+    Model rubyModel;
+	if (!rubyModel.load("Models/ruby.obj")) return -1;
 
-    // Estado de la nave
-    glm::vec3 navePos(0.0f, 2.0f, -5.0f);
-    float     naveSpeed = 8.0f;
+    Material matBrillante(1.0f, 32.0f);
+    
+    // Objeto Piso
+    std::shared_ptr<GameObject> floorObj = std::make_shared<GameObject>("Floor", GameObjectType::MESH);
+    MeshData floorData;
+    floorData.vertices = std::vector<GLfloat>(std::begin(FLOOR_VERTS), std::end(FLOOR_VERTS));
+    floorData.indices = std::vector<GLuint>(std::begin(FLOOR_IDX), std::end(FLOOR_IDX));
+    floorObj->loadMesh(floorData);
+    floorObj->setTextureID(floorTexture.getID());
+    floorObj->setMaterial(&matOpaco);
+    floorObj->transform.setScale(50.0f, 1.0f, 50.0f);
+
+    // Objeto Nave
+    std::shared_ptr<GameObject> naveObj = std::make_shared<GameObject>("Nave", GameObjectType::MODEL);
+    naveObj->setModel(&nave);
+    naveObj->setMaterial(&matBrillante);
+    naveObj->transform.setPosition(0.0f, 2.0f, -5.0f);
+    naveObj->transform.setScale(2.5f);
+
+    // Objeto Ruby
+    std::shared_ptr<GameObject> rubyObj = std::make_shared<GameObject>("Ruby", GameObjectType::MODEL);
+    rubyObj->setModel(&rubyModel);
+    rubyObj->setMaterial(&matOpaco);
+    rubyObj->transform.setPosition(0.0f, 1.0f, 5.0f);
+    rubyObj->transform.setScale(5.0f);
+    
+    float naveSpeed = 8.0f;
 
     // Luz direccional
     DirectionalLight directionalLight(
@@ -105,6 +132,22 @@ int main()
         15.0f
     );
     spotLightCount++;
+
+    // Faro rojo de la nave (SpotLight rojo hacia abajo)
+    spotLights[1] = SpotLight(
+        1.0f, 0.0f, 0.0f, 
+        1.0f, 1.0f, 
+        0.0f, 0.0f, 0.0f, 
+        0.0f, -1.0f, 0.0f, 
+        1.0f, 0.1f, 0.03f,
+        20.0f
+    );
+    spotLightCount++;
+
+    std::shared_ptr<GameObject> naveFaroDir = std::make_shared<GameObject>("NaveFaro", GameObjectType::SPOT_LIGHT);
+    naveFaroDir->setSpotLight(&spotLights[1]);
+    naveFaroDir->transform.setPosition(0.0f, -0.5f, 0.0f);
+    naveObj->addChild(naveFaroDir);
 
 	// Proyección
     glm::mat4 projection = glm::perspective(
@@ -137,11 +180,11 @@ int main()
 
 		// Tecla Z para mover la nave hacia adelante
         if (input.isKeyDown(GLFW_KEY_Z))
-            navePos.x -= naveSpeed * deltaTime;
+            naveObj->transform.translate(-naveSpeed * deltaTime, 0.0f, 0.0f);
 
 		// Tecla X para mover la nave hacia atrás
         if (input.isKeyDown(GLFW_KEY_X))
-			navePos.x += naveSpeed * deltaTime;
+			naveObj->transform.translate(naveSpeed * deltaTime, 0.0f, 0.0f);
 
         // Actualizar linterna con posición y dirección de la cámara
         spotLights[0].setFlash(camera.getPosition(), camera.getDirection());
@@ -167,24 +210,16 @@ int main()
         shader.setDirectionalLight(&directionalLight);
         shader.setSpotLights(spotLights, spotLightCount);
 
-        // Piso
-        model = glm::mat4(1.0f);
-        model = glm::scale(model, glm::vec3(50.0f, 1.0f, 50.0f));
-        glUniformMatrix4fv(shader.getModelLocation(), 1, GL_FALSE, glm::value_ptr(model));
+        // Renderizar objetos
+        floorObj->draw(shader);
+        
+        naveObj->draw(shader);
 
-        matOpaco.use(shader.getSpecularIntensityLocation(), shader.getShininessLocation());
-        floorTexture.bind();
-        floorMesh.render();
-        floorTexture.unbind();
-
-        // Nave
-        model = glm::mat4(1.0f);
-        model = glm::translate(model, navePos);
-        model = glm::scale(model, glm::vec3(2.5f));
-        glUniformMatrix4fv(shader.getModelLocation(), 1, GL_FALSE, glm::value_ptr(model));
-
-        matBrillante.use(shader.getSpecularIntensityLocation(), shader.getShininessLocation());
-        nave.render();
+        // Ruby con alpha blend
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        rubyObj->draw(shader);
+        glDisable(GL_BLEND);
 
         glUseProgram(0);
         mainWindow.swapBuffers();
