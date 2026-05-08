@@ -73,6 +73,10 @@ int main()
     Model nave;
     if (!nave.load("Models/nave.obj")) return -1;
 
+    // Ruby
+    Model rubyModel;
+	if (!rubyModel.load("Models/ruby.obj")) return -1;
+
     Material matBrillante(1.0f, 32.0f);
 
     // Estado de la nave
@@ -178,6 +182,17 @@ int main()
 
         matBrillante.use(shader.getSpecularIntensityLocation(), shader.getShininessLocation());
         nave.render();
+
+		// Ruby
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(0.0f, 1.0f, 5.0f));
+		model = glm::scale(model, glm::vec3(5.0f));
+        glUniformMatrix4fv(shader.getModelLocation(), 1, GL_FALSE, glm::value_ptr(model));
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		matOpaco.use(shader.getSpecularIntensityLocation(), shader.getShininessLocation());
+		rubyModel.render();
+		glDisable(GL_BLEND);
 
         glUseProgram(0);
         mainWindow.swapBuffers();

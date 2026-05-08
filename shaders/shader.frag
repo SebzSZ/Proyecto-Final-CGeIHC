@@ -133,6 +133,12 @@ vec4 calcSpotLights()
 
 void main()
 {
+	vec4 texColor = texture(theTexture, TexCoords);
+	if (texColor.a < 0.1)
+	{
+		discard;
+	}
+
 	vec4 lightning = calcDirectionalLight() + calcPointLights() + calcSpotLights();
-	fragColor = texture(theTexture, TexCoords) * VertexColor * lightning;
+	fragColor = texColor * VertexColor * lightning;
 }
