@@ -25,6 +25,8 @@
 #include "Texture.h"
 #include "Window.h"
 #include "GameObject.h"
+#include "Train.h"
+#include "Castle.h"
 
 // Rutas de shaders
 static const char* VERT_SHADER = "shaders/shader.vert";
@@ -41,176 +43,6 @@ static GLfloat FLOOR_VERTS[] = {
        -1.0f,  0.0f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f, 0.0f,
 };
 static GLuint FLOOR_IDX[] = { 0, 1, 2,  0, 2, 3 };
-
-// CreateCastle
-// Construir la jerarquía del castillo de Hyrule
-// Todos los elementos son hijos del nodo contenedor
-std::shared_ptr<GameObject> CreateCastle(Material& matOpaco, Model& floor, Model& mainRoom, Model& bigTower, Model& wall, Model& midTower)
-{
-    // Nodo raíz
-    std::shared_ptr<GameObject> castleObj = std::make_shared<GameObject>("Castle Container", GameObjectType::MODEL);
-
-    // Sala principal
-    std::shared_ptr<GameObject> mainRoomObj = std::make_shared<GameObject>("Main Room", GameObjectType::MODEL);
-    mainRoomObj->setModel(&mainRoom);
-    mainRoomObj->setMaterial(&matOpaco);
-    mainRoomObj->transform.setPosition(20.0f, 0.0f, 1.64f);
-    mainRoomObj->transform.setRotation(0.0f, 180.0f, 0.0f);
-    mainRoomObj->transform.setScale(120.0f);
-    castleObj->addChild(mainRoomObj);
-
-    // Muros
-    std::shared_ptr<GameObject> wall1Obj = std::make_shared<GameObject>("Wall 1", GameObjectType::MODEL);
-    wall1Obj->setModel(&wall);
-    wall1Obj->setMaterial(&matOpaco);
-    wall1Obj->transform.setPosition(6.9f, 0.0f, 0.0f);
-    wall1Obj->transform.setRotation(0.0f, -90.0f, 0.0f);
-    wall1Obj->transform.setScale(60.0f);
-    castleObj->addChild(wall1Obj);
-
-    std::shared_ptr<GameObject> wall2Obj = std::make_shared<GameObject>("Wall 2", GameObjectType::MODEL);
-    wall2Obj->setModel(&wall);
-    wall2Obj->setMaterial(&matOpaco);
-    wall2Obj->transform.setPosition(33.21f, 0.0f, 0.0f);
-    wall2Obj->transform.setRotation(0.0f, -90.0f, 0.0f);
-    wall2Obj->transform.setScale(60.0f);
-    castleObj->addChild(wall2Obj);
-
-    std::shared_ptr<GameObject> wall3Obj = std::make_shared<GameObject>("Wall 3", GameObjectType::MODEL);
-    wall3Obj->setModel(&wall);
-    wall3Obj->setMaterial(&matOpaco);
-    wall3Obj->transform.setPosition(40.9f, 0.0f, -7.55f);
-    wall3Obj->transform.setRotation(0.0f, 0.0f, 0.0f);
-    wall3Obj->transform.setScale(60.0f);
-    castleObj->addChild(wall3Obj);
-
-    std::shared_ptr<GameObject> wall4Obj = std::make_shared<GameObject>("Wall 4", GameObjectType::MODEL);
-    wall4Obj->setModel(&wall);
-    wall4Obj->setMaterial(&matOpaco);
-    wall4Obj->transform.setPosition(20.27f, 0.0f, -15.21f);
-    wall4Obj->transform.setRotation(0.0f, 90.0f, 0.0f);
-    wall4Obj->transform.setScale(glm::vec3(60.0f, 60.0f, 165.0f));
-    castleObj->addChild(wall4Obj);
-
-    std::shared_ptr<GameObject> wall5Obj = std::make_shared<GameObject>("Wall 5", GameObjectType::MODEL);
-    wall5Obj->setModel(&wall);
-    wall5Obj->setMaterial(&matOpaco);
-    wall5Obj->transform.setPosition(-0.73f, 0.0f, -7.66f);
-    wall5Obj->transform.setRotation(0.0f, 180.0f, 0.0f);
-    wall5Obj->transform.setScale(60.0f);
-    castleObj->addChild(wall5Obj);
-
-    std::shared_ptr<GameObject> wall6Obj = std::make_shared<GameObject>("Wall 6", GameObjectType::MODEL);
-    wall6Obj->setModel(&wall);
-    wall6Obj->setMaterial(&matOpaco);
-    wall6Obj->transform.setPosition(20.0f, 3.96f, -6.58f);
-    wall6Obj->transform.setRotation(0.0f, -90.0f, 0.0f);
-    wall6Obj->transform.setScale(60.0f);
-    castleObj->addChild(wall6Obj);
-
-    std::shared_ptr<GameObject> wall7Obj = std::make_shared<GameObject>("Wall 7", GameObjectType::MODEL);
-    wall7Obj->setModel(&wall);
-    wall7Obj->setMaterial(&matOpaco);
-    wall7Obj->transform.setPosition(20.1f, 3.96f, -12.91f);
-    wall7Obj->transform.setRotation(0.0f, 90.0f, 0.0f);
-    wall7Obj->transform.setScale(60.0f);
-    castleObj->addChild(wall7Obj);
-
-    std::shared_ptr<GameObject> wall8Obj = std::make_shared<GameObject>("Wall 8", GameObjectType::MODEL);
-    wall8Obj->setModel(&wall);
-    wall8Obj->setMaterial(&matOpaco);
-    wall8Obj->transform.setPosition(27.7f, 3.96f, -9.8f);
-    wall8Obj->transform.setRotation(0.0f, 0.0f, 0.0f);
-    wall8Obj->transform.setScale(glm::vec3(60.0f, 60.0f, 24.89f));
-    castleObj->addChild(wall8Obj);
-
-    std::shared_ptr<GameObject> wall9Obj = std::make_shared<GameObject>("Wall 9", GameObjectType::MODEL);
-    wall9Obj->setModel(&wall);
-    wall9Obj->setMaterial(&matOpaco);
-    wall9Obj->transform.setPosition(12.4f, 3.96f, -9.8f);
-    wall9Obj->transform.setRotation(0.0f, 180.0f, 0.0f);
-    wall9Obj->transform.setScale(glm::vec3(60.0f, 60.0f, 24.89f));
-    castleObj->addChild(wall9Obj);
-
-    // Torres grandes
-    std::shared_ptr<GameObject> bigTower1Obj = std::make_shared<GameObject>("Big Tower 1", GameObjectType::MODEL);
-    bigTower1Obj->setModel(&bigTower);
-    bigTower1Obj->setMaterial(&matOpaco);
-    bigTower1Obj->transform.setPosition(16.84f, 8.92f, -9.0f);
-    bigTower1Obj->transform.setScale(60.0f);
-    castleObj->addChild(bigTower1Obj);
-
-    std::shared_ptr<GameObject> bigTower2Obj = std::make_shared<GameObject>("Big Tower 2", GameObjectType::MODEL);
-    bigTower2Obj->setModel(&bigTower);
-    bigTower2Obj->setMaterial(&matOpaco);
-    bigTower2Obj->transform.setPosition(24.65f, 0.53f, -9.47f);
-    bigTower2Obj->transform.setScale(60.0f);
-    castleObj->addChild(bigTower2Obj);
-
-    // Torres medianas
-    std::shared_ptr<GameObject> midTower1Obj = std::make_shared<GameObject>("Mid Tower 1", GameObjectType::MODEL);
-    midTower1Obj->setModel(&midTower);
-    midTower1Obj->setMaterial(&matOpaco);
-    midTower1Obj->transform.setPosition(36.09f, 5.44f, -3.64f);
-    midTower1Obj->transform.setRotation(0.0f, -90.0f, 0.0f);
-    midTower1Obj->transform.setScale(50.0f);
-    castleObj->addChild(midTower1Obj);
-
-    std::shared_ptr<GameObject> midTower2Obj = std::make_shared<GameObject>("Mid Tower 2", GameObjectType::MODEL);
-    midTower2Obj->setModel(&midTower);
-    midTower2Obj->setMaterial(&matOpaco);
-    midTower2Obj->transform.setPosition(36.09f, 5.44f, -11.0f);
-    midTower2Obj->transform.setRotation(0.0f, -90.0f, 0.0f);
-    midTower2Obj->transform.setScale(50.0f);
-    castleObj->addChild(midTower2Obj);
-
-    std::shared_ptr<GameObject> midTower3Obj = std::make_shared<GameObject>("Mid Tower 3", GameObjectType::MODEL);
-    midTower3Obj->setModel(&midTower);
-    midTower3Obj->setMaterial(&matOpaco);
-    midTower3Obj->transform.setPosition(3.69f, 5.44f, -3.64f);
-    midTower3Obj->transform.setRotation(0.0f, -90.0f, 0.0f);
-    midTower3Obj->transform.setScale(50.0f);
-    castleObj->addChild(midTower3Obj);
-
-    std::shared_ptr<GameObject> midTower4Obj = std::make_shared<GameObject>("Mid Tower 4", GameObjectType::MODEL);
-    midTower4Obj->setModel(&midTower);
-    midTower4Obj->setMaterial(&matOpaco);
-    midTower4Obj->transform.setPosition(3.69f, 5.44f, -11.0f);
-    midTower4Obj->transform.setRotation(0.0f, -90.0f, 0.0f);
-    midTower4Obj->transform.setScale(50.0f);
-    castleObj->addChild(midTower4Obj);
-
-    // Pisos interiores
-    std::shared_ptr<GameObject> floor1Obj = std::make_shared<GameObject>("Floor 1", GameObjectType::MODEL);
-    floor1Obj->setModel(&floor);
-    floor1Obj->setMaterial(&matOpaco);
-    floor1Obj->transform.setPosition(33.59f, 5.28f, -8.34f);
-    floor1Obj->transform.setScale(58.3f, 1.0f, 76.2f);
-    castleObj->addChild(floor1Obj);
-
-    std::shared_ptr<GameObject> floor2Obj = std::make_shared<GameObject>("Floor 2", GameObjectType::MODEL);
-    floor2Obj->setModel(&floor);
-    floor2Obj->setMaterial(&matOpaco);
-    floor2Obj->transform.setPosition(6.43f, 5.28f, -8.34f);
-    floor2Obj->transform.setScale(58.3f, 1.0f, 76.2f);
-    castleObj->addChild(floor2Obj);
-
-    std::shared_ptr<GameObject> floor3Obj = std::make_shared<GameObject>("Floor 3", GameObjectType::MODEL);
-    floor3Obj->setModel(&floor);
-    floor3Obj->setMaterial(&matOpaco);
-    floor3Obj->transform.setPosition(20.0f, 5.28f, -10.2f);
-    floor3Obj->transform.setScale(50.1f, 1.0f, 55.15f);
-    castleObj->addChild(floor3Obj);
-
-    std::shared_ptr<GameObject> floor4Obj = std::make_shared<GameObject>("Floor 4", GameObjectType::MODEL);
-    floor4Obj->setModel(&floor);
-    floor4Obj->setMaterial(&matOpaco);
-    floor4Obj->transform.setPosition(19.75f, 9.28f, -10.0f);
-    floor4Obj->transform.setScale(60.0f, 1.0f, 31.1f);
-    castleObj->addChild(floor4Obj);
-
-    return castleObj;
-}
 
 // CreateAvatar
 // Construir la jerarquía del avatar (Ruby)
@@ -232,7 +64,7 @@ std::shared_ptr<GameObject> CreateAvatar(
     std::shared_ptr<GameObject> rubyObj = std::make_shared<GameObject>("Ruby", GameObjectType::MODEL);
     rubyObj->setModel(&rubyModel);
     rubyObj->setMaterial(&matOpaco);
-    rubyObj->transform.setPosition(0.0f, 1.0f, 0.0f);
+    rubyObj->transform.setPosition(20.0f, 1.2f, 1.64f);
     rubyObj->transform.setScale(5.0f);
 
     // Extremidades — hijos de rubyObj
@@ -258,7 +90,7 @@ std::shared_ptr<GameObject> CreateAvatar(
 
     cape = std::make_shared<GameObject>("Cape", GameObjectType::MODEL);
     cape->setModel(&rubyCape);
-    cape->transform.setPosition(0.0f, 0.065f, -0.025f);
+    cape->transform.setPosition(0.0f, 0.065f, -0.01f);
     rubyObj->addChild(cape);
 
     return rubyObj;
@@ -267,7 +99,7 @@ std::shared_ptr<GameObject> CreateAvatar(
 // ─────────────────────────────────────────────────────────────────────────────
 int main()
 {
-	// Creación de la ventana
+    // Creación de la ventana
     Window mainWindow("Proyecto Final - CGeIHC");
     if (mainWindow.Initialize() != 0) return -1;
 
@@ -279,7 +111,7 @@ int main()
     audioManager.loadMP3("bgMusic", "Sounds/bgMusic.mp3");
     audioManager.play("bgMusic", true, 0.5f);
 
-	// Configuración inicial de la cámara
+    // Configuración inicial de la cámara
     Camera camera(glm::vec3(0.0f, 5.0f, 5.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, 0.0f, 5.0f, 0.1f);
     camera.setCameraMode(CameraMode::THIRD_PERSON);
 
@@ -287,7 +119,7 @@ int main()
     Shader shader;
     shader.createFromFiles(VERT_SHADER, FRAG_SHADER);
 
-	// Skybox con ciclo día/noche
+    // Skybox con ciclo día/noche
     Skybox skybox;
     skybox.create(
         // Texturas de día
@@ -347,8 +179,14 @@ int main()
     floorObj->setMaterial(&matOpaco);
     floorObj->transform.setScale(50.0f, 1.0f, 50.0f);
 
-    // Creación del castillo
-    std::shared_ptr<GameObject> castleObj = CreateCastle(matOpaco, floor, mainRoom, bigTower, wall, midTower);
+    Castle castle;
+    if (!castle.Initialize(matOpaco)) return -1;
+
+    Train train;
+    if (!train.Initialize(matOpaco)) return -1;
+
+    float trainSpeed = 5.0f;
+    float wheelRotationSpeed = 200.0f;
 
     // Avatar: Ruby
 
@@ -377,52 +215,38 @@ int main()
         0.0f, -1.0f, -0.5f
     );
 
-	// TODO: Puntos de interés para la cámara 
-	glm::vec3 rubyPos = rubyObj->transform.getPosition();
-	camera.addInterestPoint(rubyPos + glm::vec3(0.0f, 2.0f, 5.0f), rubyPos + glm::vec3(0.0f, 1.0f, 0.0f));  // Punto 1: Vista frontal de Ruby
-	camera.addInterestPoint(glm::vec3(0.0f, 25.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f));            // Punto 2: Vista aérea general
-	camera.addInterestPoint(rubyPos + glm::vec3(8.0f, 3.0f, 0.0f), rubyPos + glm::vec3(0.0f, 1.0f, 0.0f)); // Punto 3: Vista lateral de Ruby
-
-	// Punto de Interés 1: Torre Grande Central
-	// Enfoca una de las torres principales del castillo desde una vista dinámmica
-	glm::vec3 bigTower1Pos(16.84f, 8.92f, -9.0f);
-	camera.addInterestPoint(
-		bigTower1Pos + glm::vec3(15.0f, 8.0f, 15.0f),  // Posición de cámara
-		bigTower1Pos + glm::vec3(0.0f, 5.0f, 0.0f)      // Punto de enfoque (centro de la torre)
-	);
-
-	// Punto de Interés 2: Entrada del Castillo (Vista General)
-	// Muestra la entrada y la estructura general del castillo
-	glm::vec3 castleEntrancePos(20.0f, 5.0f, -8.0f);
-	camera.addInterestPoint(
-		castleEntrancePos + glm::vec3(-20.0f, 12.0f, 25.0f), // Posición de cámara alejada y elevada
-		castleEntrancePos                                      // Punto de enfoque (entrada)
-	);
-
-	// Punto de Interés 3: Torres de Defensa Laterales
-	// Enfoca las torres medias de las esquinas del castillo
-	glm::vec3 lateralTowerPos(36.09f, 5.44f, -3.64f);
-	camera.addInterestPoint(
-		lateralTowerPos + glm::vec3(18.0f, 10.0f, 18.0f),  // Posición de cámara en diagonal
-		lateralTowerPos + glm::vec3(0.0f, 8.0f, 0.0f)       // Punto de enfoque (torre lateral)
-	);
-
-	// Proyección
-    glm::mat4 projection = glm::perspective(
-        glm::radians(60.0f),
-        (float)mainWindow.getBufferWidth() / (float)mainWindow.getBufferHeight(),
-        0.1f, 500.0f
+    // Punto de Interés 1: Torre Grande Central
+    // Enfoca una de las torres principales del castillo desde una vista dinámica
+    glm::vec3 bigTower1Pos(16.84f, 8.92f, -9.0f);
+    camera.addInterestPoint(
+        bigTower1Pos + glm::vec3(15.0f, 8.0f, 15.0f),
+        bigTower1Pos + glm::vec3(0.0f, 5.0f, 0.0f) 
     );
 
-	// Matriz de modelo
-	glm::mat4 model(1.0f);
-    // Matrices
-    glm::mat4 projection = glm::perspective(glm::radians(60.0f), (float)mainWindow.getBufferWidth() / (float)mainWindow.getBufferHeight(), 0.1f, 500.0f);
-    glm::mat4 model(1.0f);
+    // Punto de Interés 2: Entrada del Castillo (Vista General)
+    // Muestra la entrada y la estructura general del castillo
+    glm::vec3 castleEntrancePos(20.0f, 5.0f, -8.0f);
+    camera.addInterestPoint(
+        castleEntrancePos + glm::vec3(-20.0f, 12.0f, 25.0f),
+        castleEntrancePos
+    );
 
+    // Punto de Interés 3: Torres de Defensa Laterales
+    // Enfoca las torres medias de las esquinas del castillo
+    glm::vec3 lateralTowerPos(36.09f, 5.44f, -3.64f);
+    camera.addInterestPoint(
+        lateralTowerPos + glm::vec3(18.0f, 10.0f, 18.0f),
+        lateralTowerPos + glm::vec3(0.0f, 8.0f, 0.0f)
+    );
+
+    // Proyección
+    glm::mat4 projection = glm::perspective(glm::radians(60.0f), (float)mainWindow.getBufferWidth() / (float)mainWindow.getBufferHeight(), 0.1f, 500.0f);
+
+    // Matriz de modelo
+    glm::mat4 model(1.0f);
     GLfloat lastTime = (GLfloat)glfwGetTime();
 
-	// Bucle principal
+    // Bucle principal
     while (!mainWindow.shouldClose())
     {
         // Delta Time
@@ -438,72 +262,83 @@ int main()
         InputManager& input = InputManager::getInstance();
         input.beginFrame();
 
-		// Cambio de modo de cámara (C, V, B)
-		if (input.isKeyDown(GLFW_KEY_C))
-		// TODO: Cambiar modos de cámara
-		if (input.isKeyPressed(GLFW_KEY_1))
-		{
-			camera.setCameraMode(CameraMode::THIRD_PERSON);
-			printf("\n========== MODO 1: TERCERA PERSONA (Tecla: C) ==========\n");
-			printf("Sigue al personaje Ruby automaticamente\n");
-			printf("CONTROLES:\n");
-			printf("  - W/A/S/D: Mover a Ruby (se orienta hacia la camara)\n");
-			printf("  - Q/E: Orbitar camara alrededor de Ruby\n");
-			printf("  - RATON: Orbitar horizontalmente\n");
-			printf("  - C/V/B: Cambiar modo de camara\n");
-			printf("=========================================================\n\n");
-		}
-		if (input.isKeyDown(GLFW_KEY_V))
-		{
-			camera.setCameraMode(CameraMode::AERIAL);
-			printf("\n========== MODO 2: CAMARA AEREA (Tecla: V) ==========\n");
-			printf("Vista aerea libre para explorar el escenario\n");
-			printf("CONTROLES:\n");
-			printf("  - W/S: Adelante/Atras en Z\n");
-			printf("  - A/D: Izquierda/Derecha en X\n");
-			printf("  - Q: Subir altura de camara\n");
-			printf("  - E: Bajar altura de camara\n");
-			printf("  - Altura min: 5 unidades | max: 50 unidades\n");
-			printf("  - C/V/B: Cambiar modo de camara\n");
-			printf("  - RUBY NO SE VE AFECTADO (continua en su posicion)\n");
-			printf("=====================================================\n\n");
-		}
-		if (input.isKeyDown(GLFW_KEY_B))
-		{
-			camera.setCameraMode(CameraMode::INTEREST_POINT);
-			printf("\n========== MODO 3: PUNTOS DE INTERES (Tecla: B) ==========\n");
-			printf("Muestra elementos destacados del castillo\n");
-			printf("CONTROLES:\n");
-			printf("  - SPACE: Cambiar al siguiente punto de interes\n");
-			printf("  - Puntos disponibles:\n");
-			printf("    1. Torre Grande Central - Vista dinamica\n");
-			printf("    2. Entrada del Castillo - Vista general\n");
-			printf("    3. Torres de Defensa - Vista de las esquinas\n");
-			printf("  - C/V/B: Cambiar modo de camara\n");
-			printf("  - RUBY NO SE VE AFECTADO (continua en su posicion)\n");
-			printf("========================================================\n\n");
-		}
+        // Cambio de modo de cámara (C, V, B)
+        if (input.isKeyDown(GLFW_KEY_C))
+        {
+            camera.setCameraMode(CameraMode::THIRD_PERSON);
+        }
 
-		// Avanzar al siguiente punto de interés con SPACE
-		if (input.isKeyPressed(GLFW_KEY_SPACE) && camera.getCameraMode() == CameraMode::INTEREST_POINT)
-			camera.nextInterestPoint();
+        if (input.isKeyDown(GLFW_KEY_V))
+        {
+            camera.setCameraMode(CameraMode::AERIAL);
+        }
 
-		// Actualizar cámara según el modo actual
-		switch (camera.getCameraMode())
-		{
-		case CameraMode::THIRD_PERSON:
-			camera.mouseControl(input.getMouseDeltaX() * 0.5f, input.getMouseDeltaY() * 0.5f);
-			camera.updateThirdPersonCamera(rubyObj->transform.getPosition(), deltaTime);
-			break;
-		case CameraMode::AERIAL:
-			// TODO: Implementar cámara aérea
-			break;
-		case CameraMode::INTEREST_POINT:
-			// TODO: Implementar cámara de puntos de interés
-			break;
-		}
+        if (input.isKeyDown(GLFW_KEY_B))
+        {
+            camera.setCameraMode(CameraMode::INTEREST_POINT);
+        }
 
-        // Movimiento de Ruby
+        // Avanzar al siguiente punto de interés con SPACE
+        if (input.isKeyDown(GLFW_KEY_SPACE) && camera.getCameraMode() == CameraMode::INTEREST_POINT)
+            camera.nextInterestPoint();
+
+        // Actualizar cámara según el modo actual
+        glm::vec3 rubyPos = rubyObj->transform.getPosition();
+
+        // Destino de tercera persona (usado como target en transiciones hacia/desde ese modo)
+        glm::vec3 camDir3P = camera.getDirection();
+        glm::vec3 thirdCamPos = rubyPos - glm::normalize(glm::vec3(camDir3P.x, 0.0f, camDir3P.z)) * 2.5f;
+        thirdCamPos.y = rubyPos.y + 1.0f;
+        glm::vec3 thirdLookAt = rubyPos + glm::vec3(0.0f, 1.0f, 0.0f);
+
+        // Destino aéreo: posición sobre el centro del mapa a aerialHeight
+        glm::vec3 aerialTarget(0.0f, 15.0f, 0.0f);
+        glm::vec3 aerialLookAt(0.0f, 0.0f, 0.0f);
+
+        switch (camera.getCameraMode())
+        {
+        case CameraMode::THIRD_PERSON:
+            // Durante transición hacia tercera persona, proveer el destino
+            if (camera.isInModeTransition())
+            {
+                camera.setTransitionTarget(thirdCamPos, thirdLookAt);
+                camera.updateInterestPointCamera(deltaTime);
+                break;
+            }
+            // Control normal
+            if (input.isKeyDown(GLFW_KEY_Q))
+                camera.rotateOrbit(90.0f * deltaTime);
+            if (input.isKeyDown(GLFW_KEY_E))
+                camera.rotateOrbit(-90.0f * deltaTime);
+            camera.mouseControl(input.getMouseDeltaX() * 0.5f, input.getMouseDeltaY() * 0.5f);
+            camera.updateThirdPersonCamera(rubyPos, deltaTime);
+            break;
+
+        case CameraMode::AERIAL:
+            // Durante transición hacia aéreo, proveer el destino
+            if (camera.isInModeTransition())
+            {
+                camera.setTransitionTarget(aerialTarget, aerialLookAt);
+                camera.updateInterestPointCamera(deltaTime);
+                break;
+            }
+            // Control normal
+            camera.updateAerialCamera(input, deltaTime);
+            break;
+
+        case CameraMode::INTEREST_POINT:
+        {
+            // Proveer destino de salida hacia tercera persona
+            camera.setTransitionTarget(thirdCamPos, thirdLookAt);
+            camera.updateInterestPointCamera(deltaTime);
+            break;
+        }
+        }
+
+        // Movimiento del tren
+        train.Update(trainSpeed, deltaTime, wheelRotationSpeed);
+
+        // Movimiento de Ruby — solo en modo THIRD_PERSON y sin transición activa
         float rubyMoveSpeed = 8.0f;
         glm::vec3 cameraDirection = camera.getDirection();
         glm::vec3 moveDirection = glm::normalize(glm::vec3(cameraDirection.x, 0.0f, cameraDirection.z));
@@ -511,29 +346,32 @@ int main()
 
         bool isWalking = false;
 
-        if (input.isKeyDown(GLFW_KEY_W))
+        if (camera.getCameraMode() == CameraMode::THIRD_PERSON && !camera.isInModeTransition())
         {
-            glm::vec3 movement = moveDirection * rubyMoveSpeed * deltaTime;
-            rubyObj->transform.translate(movement.x, 0.0f, movement.z);
-            isWalking = true;
-        }
-        if (input.isKeyDown(GLFW_KEY_S))
-        {
-            glm::vec3 movement = moveDirection * rubyMoveSpeed * deltaTime;
-            rubyObj->transform.translate(-movement.x, 0.0f, -movement.z);
-            isWalking = true;
-        }
-        if (input.isKeyDown(GLFW_KEY_A))
-        {
-            glm::vec3 movement = rightDirection * rubyMoveSpeed * deltaTime;
-            rubyObj->transform.translate(-movement.x, 0.0f, -movement.z);
-            isWalking = true;
-        }
-        if (input.isKeyDown(GLFW_KEY_D))
-        {
-            glm::vec3 movement = rightDirection * rubyMoveSpeed * deltaTime;
-            rubyObj->transform.translate(movement.x, 0.0f, movement.z);
-            isWalking = true;
+            if (input.isKeyDown(GLFW_KEY_W))
+            {
+                glm::vec3 movement = moveDirection * rubyMoveSpeed * deltaTime;
+                rubyObj->transform.translate(movement.x, 0.0f, movement.z);
+                isWalking = true;
+            }
+            if (input.isKeyDown(GLFW_KEY_S))
+            {
+                glm::vec3 movement = moveDirection * rubyMoveSpeed * deltaTime;
+                rubyObj->transform.translate(-movement.x, 0.0f, -movement.z);
+                isWalking = true;
+            }
+            if (input.isKeyDown(GLFW_KEY_A))
+            {
+                glm::vec3 movement = rightDirection * rubyMoveSpeed * deltaTime;
+                rubyObj->transform.translate(-movement.x, 0.0f, -movement.z);
+                isWalking = true;
+            }
+            if (input.isKeyDown(GLFW_KEY_D))
+            {
+                glm::vec3 movement = rightDirection * rubyMoveSpeed * deltaTime;
+                rubyObj->transform.translate(movement.x, 0.0f, movement.z);
+                isWalking = true;
+            }
         }
 
         // Animación de caminata de Ruby
@@ -554,10 +392,13 @@ int main()
         rightLeg->transform.setRotation(angleThigh, 0.0f, 0.0f);
         cape->transform.setRotation((-angleThigh * 0.5f) + 45.0f, 0.0f, 0.0f);
 
-        // Orientar a Ruby hacia donde mira la cámara
-        glm::vec3 rubyDirection = glm::normalize(glm::vec3(cameraDirection.x, 0.0f, cameraDirection.z));
-        float angleY = atan2(rubyDirection.x, rubyDirection.z);
-        rubyObj->transform.setRotation(0.0f, glm::degrees(angleY), 0.0f);
+        // Orientar a Ruby hacia donde mira la cámara — solo en modo THIRD_PERSON sin transición
+        if (camera.getCameraMode() == CameraMode::THIRD_PERSON && !camera.isInModeTransition())
+        {
+            glm::vec3 rubyDirection = glm::normalize(glm::vec3(cameraDirection.x, 0.0f, cameraDirection.z));
+            float angleY = atan2(rubyDirection.x, rubyDirection.z);
+            rubyObj->transform.setRotation(0.0f, glm::degrees(angleY), 0.0f);
+        }
 
         // Luces
 
@@ -610,9 +451,14 @@ int main()
 
         // Objetos de la escena
         floorObj->draw(shader);
-        castleObj->draw(shader);
+        
+        // Render del castillo
+        castle.GetCastleObject()->draw(shader);
 
-        // Ruby con alpha blending (necesario por transparencias en la capa)
+        // Render del tren
+        train.GetTrainObject()->draw(shader);
+
+        // Ruby
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         rubyObj->draw(shader);
