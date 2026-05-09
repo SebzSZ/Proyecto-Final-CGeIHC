@@ -119,6 +119,34 @@ int main()
     Shader shader;
     shader.createFromFiles(VERT_SHADER, FRAG_SHADER);
 
+	// Creación del skybox con texturas de día y noche (ambas con Space)
+	Skybox skybox;
+	skybox.create(
+		// Texturas de día (Space Nebula Blue)
+		// Orden: RIGHT, LEFT, UP, DOWN, FRONT, BACK
+		{
+			"Textures/Space Skybox Pack/nebula/jettelly_space_nebulas_blue_RIGHT.png",
+			"Textures/Space Skybox Pack/nebula/jettelly_space_nebulas_blue_LEFT.png",
+			"Textures/Space Skybox Pack/nebula/jettelly_space_nebulas_blue_UP.png",
+			"Textures/Space Skybox Pack/nebula/jettelly_space_nebulas_blue_DOWN.png",
+			"Textures/Space Skybox Pack/nebula/jettelly_space_nebulas_blue_FRONT.png",
+			"Textures/Space Skybox Pack/nebula/jettelly_space_nebulas_blue_BACK.png"
+		},
+		// Texturas de noche (Space Nebula Blue)
+		// Orden: RIGHT, LEFT, UP, DOWN, FRONT, BACK
+		{
+			"Textures/Space Skybox Pack/nebula/jettelly_space_nebulas_blue_RIGHT.png",
+			"Textures/Space Skybox Pack/nebula/jettelly_space_nebulas_blue_LEFT.png",
+			"Textures/Space Skybox Pack/nebula/jettelly_space_nebulas_blue_UP.png",
+			"Textures/Space Skybox Pack/nebula/jettelly_space_nebulas_blue_DOWN.png",
+			"Textures/Space Skybox Pack/nebula/jettelly_space_nebulas_blue_FRONT.png",
+			"Textures/Space Skybox Pack/nebula/jettelly_space_nebulas_blue_BACK.png"
+		},
+		SKYBOX_VERT, SKYBOX_FRAG
+	);
+
+	// Configurar duración del ciclo día-noche (30 segundos para el ciclo completo)
+	skybox.setDayNightCycleDuration(30.0f);
     // Skybox con ciclo día/noche
     Skybox skybox;
     skybox.create(
@@ -449,6 +477,10 @@ int main()
 
         shader.setDirectionalLight(&directionalLight);
 
+		// Renderizar objetos
+		floorObj->draw(shader);
+
+		
         // Objetos de la escena
         floorObj->draw(shader);
         
