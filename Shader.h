@@ -40,6 +40,8 @@ public:
 	void setPointLights(PointLight* lights, unsigned int lightCount);
 	void setSpotLights(SpotLight* lights, unsigned int lightCount);
 
+	GLuint getShaderID() const { return shaderID; }
+
 	~Shader();
 
 private:

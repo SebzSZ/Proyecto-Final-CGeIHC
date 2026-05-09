@@ -32,16 +32,22 @@ Skybox::Skybox()
 {}
 
 void Skybox::create(const std::vector<std::string>& dayFaces, const std::vector<std::string>& nightFaces,
-					  const char* vertexShaderPath, const char* fragmentShaderPath)
+	const char* vertexShaderPath, const char* fragmentShaderPath)
 {
 	shader.createFromFiles(vertexShaderPath, fragmentShaderPath);
 	uniformProjection = shader.getProjectionLocation();
 	uniformView = shader.getViewLocation();
 
+	// Enlazar el samplerCube al slot 0
+	shader.use();
+	glUniform1i(glGetUniformLocation(shader.getShaderID(), "skybox"), 0);
+	glUseProgram(0);
+
 	loadCubemap(dayFaces, dayCubemapID);
 	loadCubemap(nightFaces, nightCubemapID);
 	setUpMesh();
 }
+
 
 void Skybox::setUpMesh()
 {
@@ -73,7 +79,9 @@ void Skybox::loadCubemap(const std::vector<std::string>& faces, GLuint& cubemapI
 
 		if (data)
 		{
-			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+			GLenum format = (channels == 4) ? GL_RGBA : GL_RGB;
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, format,
+				width, height, 0, format, GL_UNSIGNED_BYTE, data);
 			stbi_image_free(data);
 		}
 		else

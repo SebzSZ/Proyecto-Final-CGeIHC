@@ -240,26 +240,28 @@ int main()
     Shader shader;
     shader.createFromFiles(VERT_SHADER, FRAG_SHADER);
 
-	// Creación del skybox con texturas de día y noche
+	// Creación del skybox con texturas de día y noche (ambas con Space)
 	Skybox skybox;
 	skybox.create(
-		// Texturas de día
+		// Texturas de día (Space Nebula Blue)
+		// Orden: RIGHT, LEFT, UP, DOWN, FRONT, BACK
 		{
-			"Textures/Skybox/cupertin-lake_rt.tga",
-			"Textures/Skybox/cupertin-lake_lf.tga",
-			"Textures/Skybox/cupertin-lake_up.tga",
-			"Textures/Skybox/cupertin-lake_dn.tga",
-			"Textures/Skybox/cupertin-lake_bk.tga",
-			"Textures/Skybox/cupertin-lake_ft.tga"
+			"Textures/Space Skybox Pack/nebula/jettelly_space_nebulas_blue_RIGHT.png",
+			"Textures/Space Skybox Pack/nebula/jettelly_space_nebulas_blue_LEFT.png",
+			"Textures/Space Skybox Pack/nebula/jettelly_space_nebulas_blue_UP.png",
+			"Textures/Space Skybox Pack/nebula/jettelly_space_nebulas_blue_DOWN.png",
+			"Textures/Space Skybox Pack/nebula/jettelly_space_nebulas_blue_FRONT.png",
+			"Textures/Space Skybox Pack/nebula/jettelly_space_nebulas_blue_BACK.png"
 		},
-		// Texturas de noche (las mismas por ahora, puedes reemplazarlas con texturas nocturnas)
+		// Texturas de noche (Space Nebula Blue)
+		// Orden: RIGHT, LEFT, UP, DOWN, FRONT, BACK
 		{
-			"Textures/Skybox/cupertin-lake_rt.tga",
-			"Textures/Skybox/cupertin-lake_lf.tga",
-			"Textures/Skybox/cupertin-lake_up.tga",
-			"Textures/Skybox/cupertin-lake_dn.tga",
-			"Textures/Skybox/cupertin-lake_bk.tga",
-			"Textures/Skybox/cupertin-lake_ft.tga"
+			"Textures/Space Skybox Pack/nebula/jettelly_space_nebulas_blue_RIGHT.png",
+			"Textures/Space Skybox Pack/nebula/jettelly_space_nebulas_blue_LEFT.png",
+			"Textures/Space Skybox Pack/nebula/jettelly_space_nebulas_blue_UP.png",
+			"Textures/Space Skybox Pack/nebula/jettelly_space_nebulas_blue_DOWN.png",
+			"Textures/Space Skybox Pack/nebula/jettelly_space_nebulas_blue_FRONT.png",
+			"Textures/Space Skybox Pack/nebula/jettelly_space_nebulas_blue_BACK.png"
 		},
 		SKYBOX_VERT, SKYBOX_FRAG
 	);
@@ -562,7 +564,7 @@ int main()
 		// Renderizar objetos
 		floorObj->draw(shader);
 
-		//naveObj->draw(shader);
+		
 
 		// Ruby con alpha blend
 		glEnable(GL_BLEND);
