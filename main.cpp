@@ -18,6 +18,8 @@
 #include "Texture.h"
 #include "Window.h"
 #include "GameObject.h"
+#include "Train.h"
+#include "Castle.h"
 
 // Rutas de recursos
 static const char* VERT_SHADER = "shaders/shader.vert";
@@ -27,389 +29,198 @@ static const char* SKYBOX_FRAG = "shaders/skybox.frag";
 
 // Plano del piso
 static GLfloat FLOOR_VERTS[] = {
-    //  x      y      z      u      v      nx    ny    nz
-       -1.0f,  0.0f, -1.0f,  0.0f, 10.0f,  0.0f, 1.0f, 0.0f,
-        1.0f,  0.0f, -1.0f, 10.0f, 10.0f,  0.0f, 1.0f, 0.0f,
-        1.0f,  0.0f,  1.0f, 10.0f,  0.0f,  0.0f, 1.0f, 0.0f,
-       -1.0f,  0.0f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f, 0.0f,
+	//  x      y      z      u      v      nx    ny    nz
+	   -1.0f,  0.0f, -1.0f,  0.0f, 10.0f,  0.0f, 1.0f, 0.0f,
+		1.0f,  0.0f, -1.0f, 10.0f, 10.0f,  0.0f, 1.0f, 0.0f,
+		1.0f,  0.0f,  1.0f, 10.0f,  0.0f,  0.0f, 1.0f, 0.0f,
+	   -1.0f,  0.0f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f, 0.0f,
 };
 static GLuint FLOOR_IDX[] = { 0, 1, 2,  0, 2, 3 };
-
-std::shared_ptr<GameObject> CreateCastle(Material& matOpaco, Model& floor, Model& mainRoom, Model& bigTower, Model& wall, Model& midTower)
-{
-    // Container
-    std::shared_ptr<GameObject> castleObj = std::make_shared<GameObject>("Castle Container", GameObjectType::MODEL);
-
-    // Main Room
-    std::shared_ptr<GameObject> mainRoomObj = std::make_shared<GameObject>("Main Room", GameObjectType::MODEL);
-    mainRoomObj->setModel(&mainRoom);
-    mainRoomObj->setMaterial(&matOpaco);
-    mainRoomObj->transform.setPosition(20.0f, 0.0f, 1.64f);
-    mainRoomObj->transform.setRotation(0.0f, 180.0f, 0.0f);
-    mainRoomObj->transform.setScale(120.0f);
-	castleObj->addChild(mainRoomObj);
-
-    // Wall 1
-    std::shared_ptr<GameObject> wall1Obj = std::make_shared<GameObject>("Wall 1", GameObjectType::MODEL);
-    wall1Obj->setModel(&wall);
-    wall1Obj->setMaterial(&matOpaco);
-    wall1Obj->transform.setPosition(6.9f, 0.0f, 0.0f);
-    wall1Obj->transform.setRotation(0.0f, -90.0f, 0.0f);
-    wall1Obj->transform.setScale(60.0f);
-	castleObj->addChild(wall1Obj);
-
-	// Wall 2
-	std::shared_ptr<GameObject> wall2Obj = std::make_shared<GameObject>("Wall 2", GameObjectType::MODEL);
-	wall2Obj->setModel(&wall);
-	wall2Obj->setMaterial(&matOpaco);
-	wall2Obj->transform.setPosition(33.21f, 0.0f, 0.0f);
-	wall2Obj->transform.setRotation(0.0f, -90.0f, 0.0f);
-	wall2Obj->transform.setScale(60.0f);
-	castleObj->addChild(wall2Obj);
-
-	// Wall 3
-	std::shared_ptr<GameObject> wall3Obj = std::make_shared<GameObject>("Wall 3", GameObjectType::MODEL);
-	wall3Obj->setModel(&wall);
-	wall3Obj->setMaterial(&matOpaco);
-	wall3Obj->transform.setPosition(40.9f, 0.0f, -7.55f);
-	wall3Obj->transform.setRotation(0.0f, 0.0f, 0.0f);
-	wall3Obj->transform.setScale(60.0f);
-	castleObj->addChild(wall3Obj);
-
-	// Wall 4
-	std::shared_ptr<GameObject> wall4Obj = std::make_shared<GameObject>("Wall 4", GameObjectType::MODEL);
-	wall4Obj->setModel(&wall);
-	wall4Obj->setMaterial(&matOpaco);
-	wall4Obj->transform.setPosition(20.27f, 0.0f, -15.21f);
-	wall4Obj->transform.setRotation(0.0f, 90.0f, 0.0f);
-	wall4Obj->transform.setScale(glm::vec3(60.0f, 60.0f, 165.0f));
-	castleObj->addChild(wall4Obj);
-
-	// Wall 5
-	std::shared_ptr<GameObject> wall5Obj = std::make_shared<GameObject>("Wall 5", GameObjectType::MODEL);
-	wall5Obj->setModel(&wall);
-	wall5Obj->setMaterial(&matOpaco);
-	wall5Obj->transform.setPosition(-0.73f, 0.0f, -7.66f);
-	wall5Obj->transform.setRotation(0.0f, 180.0f, 0.0f);
-	wall5Obj->transform.setScale(60.0f);
-	castleObj->addChild(wall5Obj);
-
-	// Wall 6
-	std::shared_ptr<GameObject> wall6Obj = std::make_shared<GameObject>("Wall 6", GameObjectType::MODEL);
-	wall6Obj->setModel(&wall);
-	wall6Obj->setMaterial(&matOpaco);
-	wall6Obj->transform.setPosition(20.0f, 3.96f, -6.58f);
-	wall6Obj->transform.setRotation(0.0f, -90.0f, 0.0f);
-	wall6Obj->transform.setScale(60.0f);
-	castleObj->addChild(wall6Obj);
-
-	// Wall 7
-	std::shared_ptr<GameObject> wall7Obj = std::make_shared<GameObject>("Wall 7", GameObjectType::MODEL);
-	wall7Obj->setModel(&wall);
-	wall7Obj->setMaterial(&matOpaco);
-	wall7Obj->transform.setPosition(20.1f, 3.96f, -12.91f);
-	wall7Obj->transform.setRotation(0.0f, 90.0f, 0.0f);
-	wall7Obj->transform.setScale(60.0f);
-	castleObj->addChild(wall7Obj);
-
-	// Wall 8
-	std::shared_ptr<GameObject> wall8Obj = std::make_shared<GameObject>("Wall 8", GameObjectType::MODEL);
-	wall8Obj->setModel(&wall);
-	wall8Obj->setMaterial(&matOpaco);
-	wall8Obj->transform.setPosition(27.7f, 3.96f, -9.8f);
-	wall8Obj->transform.setRotation(0.0f, 0.0f, 0.0f);
-	wall8Obj->transform.setScale(60.0f);
-	wall8Obj->transform.setScale(glm::vec3(60.0f, 60.0f, 24.89f));
-	castleObj->addChild(wall8Obj);
-
-	// Wall 9
-	std::shared_ptr<GameObject> wall9Obj = std::make_shared<GameObject>("Wall 9", GameObjectType::MODEL);
-	wall9Obj->setModel(&wall);
-	wall9Obj->setMaterial(&matOpaco);
-	wall9Obj->transform.setPosition(12.4f, 3.96f, -9.8f);
-	wall9Obj->transform.setRotation(0.0f, 180.0f, 0.0f);
-	wall9Obj->transform.setScale(glm::vec3(60.0f, 60.0f, 24.89f));
-	castleObj->addChild(wall9Obj);
-
-	// Big Tower 1
-	std::shared_ptr<GameObject> bigTower1Obj = std::make_shared<GameObject>("Big Tower 1", GameObjectType::MODEL);
-	bigTower1Obj->setModel(&bigTower);
-	bigTower1Obj->setMaterial(&matOpaco);
-	bigTower1Obj->transform.setPosition(16.84f, 8.92f, -9.0f);
-	bigTower1Obj->transform.setScale(60.0f);
-	castleObj->addChild(bigTower1Obj);
-
-	// Big Tower 2
-	std::shared_ptr<GameObject> bigTower2Obj = std::make_shared<GameObject>("Big Tower 2", GameObjectType::MODEL);
-	bigTower2Obj->setModel(&bigTower);
-	bigTower2Obj->setMaterial(&matOpaco);
-	bigTower2Obj->transform.setPosition(24.65f, 0.53f, -9.47f);
-	bigTower2Obj->transform.setScale(60.0f);
-	castleObj->addChild(bigTower2Obj);
-
-	// Mid Tower 1
-	std::shared_ptr<GameObject> midTower1Obj = std::make_shared<GameObject>("Mid Tower 1", GameObjectType::MODEL);
-	midTower1Obj->setModel(&midTower);
-	midTower1Obj->setMaterial(&matOpaco);
-	midTower1Obj->transform.setPosition(36.09f, 5.44f, -3.64f);
-	midTower1Obj->transform.setRotation(0.0f, -90.0f, 0.0f);
-	midTower1Obj->transform.setScale(50.0f);
-	castleObj->addChild(midTower1Obj);
-
-	// Mid Tower 2
-	std::shared_ptr<GameObject> midTower2Obj = std::make_shared<GameObject>("Mid Tower 2", GameObjectType::MODEL);
-	midTower2Obj->setModel(&midTower);
-	midTower2Obj->setMaterial(&matOpaco);
-	midTower2Obj->transform.setPosition(36.09f, 5.44f, -11.0f);
-	midTower2Obj->transform.setRotation(0.0f, -90.0f, 0.0f);
-	midTower2Obj->transform.setScale(50.0f);
-	castleObj->addChild(midTower2Obj);
-
-	// Mid Tower 3
-	std::shared_ptr<GameObject> midTower3Obj = std::make_shared<GameObject>("Mid Tower 3", GameObjectType::MODEL);
-	midTower3Obj->setModel(&midTower);
-	midTower3Obj->setMaterial(&matOpaco);
-	midTower3Obj->transform.setPosition(3.69f, 5.44f, -3.64f);
-	midTower3Obj->transform.setRotation(0.0f, -90.0f, 0.0f);
-	midTower3Obj->transform.setScale(50.0f);
-	castleObj->addChild(midTower3Obj);
-
-	// Mid Tower 4
-	std::shared_ptr<GameObject> midTower4Obj = std::make_shared<GameObject>("Mid Tower 4", GameObjectType::MODEL);
-	midTower4Obj->setModel(&midTower);
-	midTower4Obj->setMaterial(&matOpaco);
-	midTower4Obj->transform.setPosition(3.69f, 5.44f, -11.0f);
-	midTower4Obj->transform.setRotation(0.0f, -90.0f, 0.0f);
-	midTower4Obj->transform.setScale(50.0f);
-	castleObj->addChild(midTower4Obj);
-
-	// Floor 1
-	std::shared_ptr<GameObject> floor1Obj = std::make_shared<GameObject>("Floor 1", GameObjectType::MODEL);
-	floor1Obj->setModel(&floor);    
-	floor1Obj->setMaterial(&matOpaco);
-	floor1Obj->transform.setPosition(33.59f, 5.28f, -8.34f);
-	floor1Obj->transform.setScale(58.3f, 1.0f, 76.2f);
-	castleObj->addChild(floor1Obj);
-
-	// Floor 2
-	std::shared_ptr<GameObject> floor2Obj = std::make_shared<GameObject>("Floor 2", GameObjectType::MODEL);
-	floor2Obj->setModel(&floor);
-	floor2Obj->setMaterial(&matOpaco);
-	floor2Obj->transform.setPosition(6.43f, 5.28f, -8.34f);
-	floor2Obj->transform.setScale(58.3f, 1.0f, 76.2f);
-	castleObj->addChild(floor2Obj);
-
-	// Floor 3
-	std::shared_ptr<GameObject> floor3Obj = std::make_shared<GameObject>("Floor 3", GameObjectType::MODEL);
-	floor3Obj->setModel(&floor);
-	floor3Obj->setMaterial(&matOpaco);
-	floor3Obj->transform.setPosition(20.0f, 5.28f, -10.2f);
-	floor3Obj->transform.setScale(50.1f, 1.0f, 55.15f);
-	castleObj->addChild(floor3Obj);
-
-	// Floor 4
-	std::shared_ptr<GameObject> floor4Obj = std::make_shared<GameObject>("Floor 4", GameObjectType::MODEL);
-	floor4Obj->setModel(&floor);
-	floor4Obj->setMaterial(&matOpaco);
-	floor4Obj->transform.setPosition(19.75f, 9.28f, -10.0f);
-	floor4Obj->transform.setScale(60.0f, 1.0f, 31.1f);
-	castleObj->addChild(floor4Obj);
-
-    return castleObj;
-}
 
 int main()
 {
 	// Crear ventana
-    Window mainWindow("Proyecto Final - CGeIHC");
-    if (mainWindow.Initialize() != 0) return -1;
+	Window mainWindow("Proyecto Final - CGeIHC");
+	if (mainWindow.Initialize() != 0) return -1;
 
 	AudioManager& audioManager = AudioManager::getInstance();
 	if (!audioManager.Initialize()) return -1;
 
 	audioManager.loadMP3("bgMusic", "Sounds/bgMusic.mp3");
-	audioManager.play("bgMusic", true, 0.5f);
+	//audioManager.play("bgMusic", true, 0.5f);
 
-    // Configurar cámara
-    Camera camera(glm::vec3(0.0f, 2.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, 0.0f, 5.0f, 0.1f);
+	// Configurar cámara
+	Camera camera(glm::vec3(0.0f, 2.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, 0.0f, 5.0f, 0.1f);
 
-    // Creación de shader
-    Shader shader;
-    shader.createFromFiles(VERT_SHADER, FRAG_SHADER);
+	// Creación de shader
+	Shader shader;
+	shader.createFromFiles(VERT_SHADER, FRAG_SHADER);
 
 	// Creación del skybox
-    Skybox skybox;
-    skybox.create(
-        {
-            "Textures/Skybox/cupertin-lake_rt.tga",
-            "Textures/Skybox/cupertin-lake_lf.tga",
-            "Textures/Skybox/cupertin-lake_up.tga",
-            "Textures/Skybox/cupertin-lake_dn.tga",
-            "Textures/Skybox/cupertin-lake_bk.tga",
-            "Textures/Skybox/cupertin-lake_ft.tga"
-        },
-        SKYBOX_VERT, SKYBOX_FRAG
-    );
+	Skybox skybox;
+	skybox.create(
+		{
+			"Textures/Skybox/cupertin-lake_rt.tga",
+			"Textures/Skybox/cupertin-lake_lf.tga",
+			"Textures/Skybox/cupertin-lake_up.tga",
+			"Textures/Skybox/cupertin-lake_dn.tga",
+			"Textures/Skybox/cupertin-lake_bk.tga",
+			"Textures/Skybox/cupertin-lake_ft.tga"
+		},
+		SKYBOX_VERT, SKYBOX_FRAG
+	);
 
-    // Crear piso con Mesh
-    Mesh floorMesh;
-    floorMesh.create(FLOOR_VERTS, FLOOR_IDX, 32, 6);
+	// Crear piso con Mesh
+	Mesh floorMesh;
+	floorMesh.create(FLOOR_VERTS, FLOOR_IDX, 32, 6);
 
-    Texture floorTexture("Textures/piso.tga");
-    floorTexture.loadWithAlpha();
+	Texture floorTexture("Textures/piso.tga");
+	floorTexture.loadWithAlpha();
 
-    Material matOpaco(0.2f, 4.0f);
+	Material matOpaco(0.2f, 4.0f);
+	Material matBrillante(1.0f, 32.0f);
 
-    // Nave
-    Model nave;
-    if (!nave.load("Models/nave.obj")) return -1;
+	// Nave (queda en main por ahora porque es el avatar suelto del jugador)
+	Model nave;
+	if (!nave.load("Models/nave.obj")) return -1;
 
-    // Ruby
-    Model rubyModel;
+	// Ruby
+	Model rubyModel;
 	if (!rubyModel.load("Models/ruby.obj")) return -1;
 
-    Model mainRoom;
-	if (!mainRoom.load("Models/HyruleCastle_MainRoom.obj")) return -1;
+	// Objeto Piso
+	std::shared_ptr<GameObject> floorObj = std::make_shared<GameObject>("Floor", GameObjectType::MESH);
+	MeshData floorData;
+	floorData.vertices = std::vector<GLfloat>(std::begin(FLOOR_VERTS), std::end(FLOOR_VERTS));
+	floorData.indices = std::vector<GLuint>(std::begin(FLOOR_IDX), std::end(FLOOR_IDX));
+	floorObj->loadMesh(floorData);
+	floorObj->setTextureID(floorTexture.getID());
+	floorObj->setMaterial(&matOpaco);
+	floorObj->transform.setScale(50.0f, 1.0f, 50.0f);
 
-    Model bigTower;
-	if (!bigTower.load("Models/HyruleCastle_BigTower.obj")) return -1;
+	// Objeto Nave
+	std::shared_ptr<GameObject> naveObj = std::make_shared<GameObject>("Nave", GameObjectType::MODEL);
+	naveObj->setModel(&nave);
+	naveObj->setMaterial(&matBrillante);
+	naveObj->transform.setPosition(0.0f, 2.0f, -5.0f);
+	naveObj->transform.setScale(2.5f);
 
-    Model wall;
-	if (!wall.load("Models/HyruleCastle_Wall.obj")) return -1;
+	// Objeto Ruby
+	std::shared_ptr<GameObject> rubyObj = std::make_shared<GameObject>("Ruby", GameObjectType::MODEL);
+	rubyObj->setModel(&rubyModel);
+	rubyObj->setMaterial(&matOpaco);
+	rubyObj->transform.setPosition(0.0f, 1.0f, 5.0f);
+	rubyObj->transform.setScale(5.0f);
 
-    Model midTower;
-	if (!midTower.load("Models/HyruleCastle_MidTower.obj")) return -1;
+	Castle castle;
+	if (!castle.Initialize(matOpaco)) return -1;
 
-    Model floor;
-	if (!floor.load("Models/HyruleCastle_Floor.obj")) return -1;
-
-    Material matBrillante(1.0f, 32.0f);
-    
-    // Objeto Piso
-    std::shared_ptr<GameObject> floorObj = std::make_shared<GameObject>("Floor", GameObjectType::MESH);
-    MeshData floorData;
-    floorData.vertices = std::vector<GLfloat>(std::begin(FLOOR_VERTS), std::end(FLOOR_VERTS));
-    floorData.indices = std::vector<GLuint>(std::begin(FLOOR_IDX), std::end(FLOOR_IDX));
-    floorObj->loadMesh(floorData);
-    floorObj->setTextureID(floorTexture.getID());
-    floorObj->setMaterial(&matOpaco);
-    floorObj->transform.setScale(50.0f, 1.0f, 50.0f);
-
-    // Objeto Nave
-    std::shared_ptr<GameObject> naveObj = std::make_shared<GameObject>("Nave", GameObjectType::MODEL);
-    naveObj->setModel(&nave);
-    naveObj->setMaterial(&matBrillante);
-    naveObj->transform.setPosition(0.0f, 2.0f, -5.0f);
-    naveObj->transform.setScale(2.5f);
-
-    // Objeto Ruby
-    std::shared_ptr<GameObject> rubyObj = std::make_shared<GameObject>("Ruby", GameObjectType::MODEL);
-    rubyObj->setModel(&rubyModel);
-    rubyObj->setMaterial(&matOpaco);
-    rubyObj->transform.setPosition(0.0f, 1.0f, 5.0f);
-    rubyObj->transform.setScale(5.0f); 
-
-	// Objeto Castillo
-    std::shared_ptr<GameObject> castleObj = CreateCastle(matOpaco, floor, mainRoom, bigTower, wall, midTower);
+	Train train;
+	if (!train.Initialize(matOpaco)) return -1;
 
 	float naveSpeed = 8.0f;
+	float trainSpeed = 5.0f;
+	float wheelRotationSpeed = 200.0f;
 
-    // Luz direccional
-    DirectionalLight directionalLight(
-        1.0f, 0.95f, 0.8f,
-        0.3f, 0.8f,
-        0.0f, -1.0f, -0.5f
-    );
+	// Luz direccional
+	DirectionalLight directionalLight(
+		1.0f, 0.95f, 0.8f,
+		0.3f, 0.8f,
+		0.0f, -1.0f, -0.5f
+	);
 
 	// Linterna que sigue a la cámara
-    SpotLight spotLights[MAX_SPOT_LIGHTS];
-    unsigned int spotLightCount = 0;
-    spotLights[0] = SpotLight(
-        1.0f, 1.0f, 1.0f,
-        0.4f, 1.0f,
-        0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f,
-        1.0f, 0.005f, 0.0f,
-        15.0f
-    );
-    spotLightCount++;
+	SpotLight spotLights[MAX_SPOT_LIGHTS];
+	unsigned int spotLightCount = 0;
+	spotLights[0] = SpotLight(
+		1.0f, 1.0f, 1.0f,
+		0.4f, 1.0f,
+		0.0f, 0.0f, 0.0f,
+		0.0f, 0.0f, 0.0f,
+		1.0f, 0.005f, 0.0f,
+		15.0f
+	);
+	spotLightCount++;
 
-    // Faro rojo de la nave (SpotLight rojo hacia abajo)
-    spotLights[1] = SpotLight(
-        1.0f, 0.0f, 0.0f, 
-        1.0f, 1.0f, 
-        0.0f, 0.0f, 0.0f, 
-        0.0f, -1.0f, 0.0f, 
-        1.0f, 0.1f, 0.03f,
-        20.0f
-    );
-    spotLightCount++;
+	// Faro rojo de la nave (SpotLight rojo hacia abajo)
+	spotLights[1] = SpotLight(
+		1.0f, 0.0f, 0.0f,
+		1.0f, 1.0f,
+		0.0f, 0.0f, 0.0f,
+		0.0f, -1.0f, 0.0f,
+		1.0f, 0.1f, 0.03f,
+		20.0f
+	);
+	spotLightCount++;
 
-    std::shared_ptr<GameObject> naveFaroDir = std::make_shared<GameObject>("NaveFaro", GameObjectType::SPOT_LIGHT);
-    naveFaroDir->setSpotLight(&spotLights[1]);
-    naveFaroDir->transform.setPosition(0.0f, -0.5f, 0.0f);
-    naveObj->addChild(naveFaroDir);
+	std::shared_ptr<GameObject> naveFaroDir = std::make_shared<GameObject>("NaveFaro", GameObjectType::SPOT_LIGHT);
+	naveFaroDir->setSpotLight(&spotLights[1]);
+	naveFaroDir->transform.setPosition(0.0f, -0.5f, 0.0f);
+	naveObj->addChild(naveFaroDir);
 
 	// Proyección
-    glm::mat4 projection = glm::perspective(
-        glm::radians(60.0f),
-        (float)mainWindow.getBufferWidth() / (float)mainWindow.getBufferHeight(),
-        0.1f, 500.0f
-    );
+	glm::mat4 projection = glm::perspective(
+		glm::radians(60.0f),
+		(float)mainWindow.getBufferWidth() / (float)mainWindow.getBufferHeight(),
+		0.1f, 500.0f
+	);
 
 	// Matriz de modelo
 	glm::mat4 model(1.0f);
 
-    GLfloat lastTime = (GLfloat)glfwGetTime();
+	GLfloat lastTime = (GLfloat)glfwGetTime();
 
-    // Loop principal
-    while (!mainWindow.shouldClose())
-    {
-        // Tiempo
-        GLfloat now = (GLfloat)glfwGetTime();
-        GLfloat deltaTime = now - lastTime;
-        lastTime = now;
+	// Loop principal
+	while (!mainWindow.shouldClose())
+	{
+		// Tiempo
+		GLfloat now = (GLfloat)glfwGetTime();
+		GLfloat deltaTime = now - lastTime;
+		lastTime = now;
 
-        // Input
-        glfwPollEvents();
-        InputManager& input = InputManager::getInstance();
-        input.beginFrame();
+		// Input
+		glfwPollEvents();
+		InputManager& input = InputManager::getInstance();
+		input.beginFrame();
 
-        // Movimiento de cámara
-        camera.keyControl(input, deltaTime);
-        camera.mouseControl(input.getMouseDeltaX(), input.getMouseDeltaY());
+		// Movimiento de cámara
+		camera.keyControl(input, deltaTime);
+		camera.mouseControl(input.getMouseDeltaX(), input.getMouseDeltaY());
 
 		// Tecla Z para mover la nave hacia adelante
-        if (input.isKeyDown(GLFW_KEY_Z))
-            naveObj->transform.translate(-naveSpeed * deltaTime, 0.0f, 0.0f);
+		if (input.isKeyDown(GLFW_KEY_Z))
+			naveObj->transform.translate(-naveSpeed * deltaTime, 0.0f, 0.0f);
 
 		// Tecla X para mover la nave hacia atrás
-        if (input.isKeyDown(GLFW_KEY_X))
+		if (input.isKeyDown(GLFW_KEY_X))
 			naveObj->transform.translate(naveSpeed * deltaTime, 0.0f, 0.0f);
 
-        // Actualizar linterna con posición y dirección de la cámara
-        spotLights[0].setFlash(camera.getPosition(), camera.getDirection());
+		// Movimiento del tren
+		train.Update(trainSpeed, deltaTime, wheelRotationSpeed);
 
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		// Actualizar linterna con posición y dirección de la cámara
+		spotLights[0].setFlash(camera.getPosition(), camera.getDirection());
 
-        // Skybox
-        skybox.draw(camera.calculateViewMatrix(), projection);
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // Activar shader principal
-        shader.use();
+		// Skybox
+		skybox.draw(camera.calculateViewMatrix(), projection);
 
-        glm::mat4 view = camera.calculateViewMatrix();
-        glUniformMatrix4fv(shader.getProjectionLocation(), 1, GL_FALSE, glm::value_ptr(projection));
-        glUniformMatrix4fv(shader.getViewLocation(), 1, GL_FALSE, glm::value_ptr(view));
-        glm::vec3 eye = camera.getPosition();
-        glUniform3f(shader.getEyePositionLocation(), eye.x, eye.y, eye.z);
-        glUniform3f(shader.getColorLocation(), 1.0f, 1.0f, 1.0f);
-        glUniform2f(shader.getTextureOffsetLocation(), 0.0f, 0.0f);
+		// Activar shader principal
+		shader.use();
 
-        // Enviar luces
-        shader.setDirectionalLight(&directionalLight);
-        shader.setSpotLights(spotLights, spotLightCount);
+		glm::mat4 view = camera.calculateViewMatrix();
+		glUniformMatrix4fv(shader.getProjectionLocation(), 1, GL_FALSE, glm::value_ptr(projection));
+		glUniformMatrix4fv(shader.getViewLocation(), 1, GL_FALSE, glm::value_ptr(view));
+		glm::vec3 eye = camera.getPosition();
+		glUniform3f(shader.getEyePositionLocation(), eye.x, eye.y, eye.z);
+		glUniform3f(shader.getColorLocation(), 1.0f, 1.0f, 1.0f);
+		glUniform2f(shader.getTextureOffsetLocation(), 0.0f, 0.0f);
+
+		// Enviar luces
+		shader.setDirectionalLight(&directionalLight);
+		shader.setSpotLights(spotLights, spotLightCount);
 
 		// Renderizar objetos
 		floorObj->draw(shader);
@@ -422,12 +233,15 @@ int main()
 		rubyObj->draw(shader);
 		glDisable(GL_BLEND);
 
-        // Render del castillo
-		castleObj->draw(shader);
+		// Render del castillo
+		castle.GetCastleObject()->draw(shader);
+
+		// Render del tren
+		train.GetTrainObject()->draw(shader);
 
 		glUseProgram(0);
-        mainWindow.swapBuffers();
-    }
-    audioManager.shutdown();
-    return 0;
+		mainWindow.swapBuffers();
+	}
+	audioManager.shutdown();
+	return 0;
 }
