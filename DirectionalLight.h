@@ -18,6 +18,11 @@ public:
 	void setAmbientIntensity(GLfloat intensity);
 	void setDiffuseIntensity(GLfloat intensity);
 	void setColor(GLfloat r, GLfloat g, GLfloat b);
+	void setColor(const glm::vec3& newColor);
+
+	glm::vec3 getColor() const { return color; }
+	GLfloat getAmbientIntensity() const { return ambientIntensity; }
+	GLfloat getDiffuseIntensity() const { return diffuseIntensity; }
 
 	~DirectionalLight();
 

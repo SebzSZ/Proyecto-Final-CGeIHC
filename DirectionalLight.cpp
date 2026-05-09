@@ -45,5 +45,10 @@ void DirectionalLight::setColor(GLfloat r, GLfloat g, GLfloat b)
 	color = glm::vec3(r, g, b);
 }
 
+void DirectionalLight::setColor(const glm::vec3& newColor)
+{
+	color = newColor;
+}
+
 DirectionalLight::~DirectionalLight()
 {}
