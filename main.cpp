@@ -339,14 +339,30 @@ int main()
 
 	// Configurar puntos de interés (después de crear rubyObj)
 	glm::vec3 rubyPos = rubyObj->transform.getPosition();
-	// Punto 1: Vista frontal de Ruby
-	camera.addInterestPoint(rubyPos + glm::vec3(0.0f, 2.0f, 5.0f), rubyPos + glm::vec3(0.0f, 1.0f, 0.0f));
 
-	// Punto 2: Vista aérea general del escenario
-	camera.addInterestPoint(glm::vec3(0.0f, 25.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+	// Punto de Interés 1: Torre Grande Central
+	// Enfoca una de las torres principales del castillo desde una vista dinámmica
+	glm::vec3 bigTower1Pos(16.84f, 8.92f, -9.0f);
+	camera.addInterestPoint(
+		bigTower1Pos + glm::vec3(15.0f, 8.0f, 15.0f),  // Posición de cámara
+		bigTower1Pos + glm::vec3(0.0f, 5.0f, 0.0f)      // Punto de enfoque (centro de la torre)
+	);
 
-	// Punto 3: Vista lateral de Ruby
-	camera.addInterestPoint(rubyPos + glm::vec3(8.0f, 3.0f, 0.0f), rubyPos + glm::vec3(0.0f, 1.0f, 0.0f));
+	// Punto de Interés 2: Entrada del Castillo (Vista General)
+	// Muestra la entrada y la estructura general del castillo
+	glm::vec3 castleEntrancePos(20.0f, 5.0f, -8.0f);
+	camera.addInterestPoint(
+		castleEntrancePos + glm::vec3(-20.0f, 12.0f, 25.0f), // Posición de cámara alejada y elevada
+		castleEntrancePos                                      // Punto de enfoque (entrada)
+	);
+
+	// Punto de Interés 3: Torres de Defensa Laterales
+	// Enfoca las torres medias de las esquinas del castillo
+	glm::vec3 lateralTowerPos(36.09f, 5.44f, -3.64f);
+	camera.addInterestPoint(
+		lateralTowerPos + glm::vec3(18.0f, 10.0f, 18.0f),  // Posición de cámara en diagonal
+		lateralTowerPos + glm::vec3(0.0f, 8.0f, 0.0f)       // Punto de enfoque (torre lateral)
+	);
 
 	// Proyección
     glm::mat4 projection = glm::perspective(
@@ -376,22 +392,48 @@ int main()
 		InputManager& input = InputManager::getInstance();
 		input.beginFrame();
 
-		// Cambio de modo de cámara
-		if (input.isKeyPressed(GLFW_KEY_1))
+		// Cambio de modo de cámara (C, V, B)
+		if (input.isKeyDown(GLFW_KEY_C))
 		{
 			camera.setCameraMode(CameraMode::THIRD_PERSON);
-			printf("[Camera] Modo: 3era Persona (Sigue el personaje)\n");
-			printf("[Orbita] Usa Q/E o el raton para rotar la camara alrededor de Ruby\n");
+			printf("\n========== MODO 1: TERCERA PERSONA (Tecla: C) ==========\n");
+			printf("Sigue al personaje Ruby automaticamente\n");
+			printf("CONTROLES:\n");
+			printf("  - W/A/S/D: Mover a Ruby (se orienta hacia la camara)\n");
+			printf("  - Q/E: Orbitar camara alrededor de Ruby\n");
+			printf("  - RATON: Orbitar horizontalmente\n");
+			printf("  - C/V/B: Cambiar modo de camara\n");
+			printf("=========================================================\n\n");
 		}
-		if (input.isKeyPressed(GLFW_KEY_2))
+		if (input.isKeyDown(GLFW_KEY_V))
 		{
 			camera.setCameraMode(CameraMode::AERIAL);
-			printf("[Camera] Modo: Aéreo (Exploración libre)\n");
+			printf("\n========== MODO 2: CAMARA AEREA (Tecla: V) ==========\n");
+			printf("Vista aerea libre para explorar el escenario\n");
+			printf("CONTROLES:\n");
+			printf("  - W/S: Adelante/Atras en Z\n");
+			printf("  - A/D: Izquierda/Derecha en X\n");
+			printf("  - Q: Subir altura de camara\n");
+			printf("  - E: Bajar altura de camara\n");
+			printf("  - Altura min: 5 unidades | max: 50 unidades\n");
+			printf("  - C/V/B: Cambiar modo de camara\n");
+			printf("  - RUBY NO SE VE AFECTADO (continua en su posicion)\n");
+			printf("=====================================================\n\n");
 		}
-		if (input.isKeyPressed(GLFW_KEY_3))
+		if (input.isKeyDown(GLFW_KEY_B))
 		{
 			camera.setCameraMode(CameraMode::INTEREST_POINT);
-			printf("[Camera] Modo: Puntos de Interés\n");
+			printf("\n========== MODO 3: PUNTOS DE INTERES (Tecla: B) ==========\n");
+			printf("Muestra elementos destacados del castillo\n");
+			printf("CONTROLES:\n");
+			printf("  - SPACE: Cambiar al siguiente punto de interes\n");
+			printf("  - Puntos disponibles:\n");
+			printf("    1. Torre Grande Central - Vista dinamica\n");
+			printf("    2. Entrada del Castillo - Vista general\n");
+			printf("    3. Torres de Defensa - Vista de las esquinas\n");
+			printf("  - C/V/B: Cambiar modo de camara\n");
+			printf("  - RUBY NO SE VE AFECTADO (continua en su posicion)\n");
+			printf("========================================================\n\n");
 		}
 
 		// Cambiar punto de interés con SPACE
