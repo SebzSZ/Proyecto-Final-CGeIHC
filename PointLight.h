@@ -16,6 +16,8 @@ public:
 
 	void setPosition(GLfloat x, GLfloat y, GLfloat z);
 	void setPosition(const glm::vec3& position);
+	void setDiffuseIntensity(GLfloat intensity);
+	void setAmbientIntensity(GLfloat intensity);
 
 	virtual ~PointLight();
 

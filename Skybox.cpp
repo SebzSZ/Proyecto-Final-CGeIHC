@@ -28,16 +28,18 @@ static const GLfloat SKYBOX_VERTICES[] = {
 };
 
 Skybox::Skybox()
-	: cubemapID(0), VAO(0), VBO(0), EBO(0), uniformView(0), uniformProjection(0)
+	: dayCubemapID(0), nightCubemapID(0), VAO(0), VBO(0), EBO(0), uniformView(0), uniformProjection(0)
 {}
 
-void Skybox::create(const std::vector<std::string>& faces, const char* vertexShaderPath, const char* fragmentShaderPath)
+void Skybox::create(const std::vector<std::string>& dayFaces, const std::vector<std::string>& nightFaces,
+					  const char* vertexShaderPath, const char* fragmentShaderPath)
 {
 	shader.createFromFiles(vertexShaderPath, fragmentShaderPath);
 	uniformProjection = shader.getProjectionLocation();
 	uniformView = shader.getViewLocation();
 
-	loadCubemap(faces);
+	loadCubemap(dayFaces, dayCubemapID);
+	loadCubemap(nightFaces, nightCubemapID);
 	setUpMesh();
 }
 
@@ -57,7 +59,7 @@ void Skybox::setUpMesh()
 	glBindVertexArray(0);
 }
 
-void Skybox::loadCubemap(const std::vector<std::string>& faces)
+void Skybox::loadCubemap(const std::vector<std::string>& faces, GLuint& cubemapID)
 {
 	glGenTextures(1, &cubemapID);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapID);
@@ -92,6 +94,11 @@ void Skybox::loadCubemap(const std::vector<std::string>& faces)
 
 void Skybox::draw(const glm::mat4& view, const glm::mat4& projection) const
 {
+	drawWithBlending(view, projection);
+}
+
+void Skybox::drawWithBlending(const glm::mat4& view, const glm::mat4& projection) const
+{
 	glm::mat4 viewNoTranslation = glm::mat4(glm::mat3(view));
 
 	GLint prevDepthFunc;
@@ -103,18 +110,59 @@ void Skybox::draw(const glm::mat4& view, const glm::mat4& projection) const
 	glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(viewNoTranslation));
 
 	glBindVertexArray(VAO);
+
+	// Determinar qué skybox mostrar basado en el progreso del día-noche
+	GLuint activeCubemap;
+	float alpha;
+
+	if (timeProgress < 0.5f)
+	{
+		// Primera mitad: día a noche
+		activeCubemap = dayCubemapID;
+		alpha = 1.0f - (timeProgress * 2.0f); // 1.0 -> 0.0
+	}
+	else
+	{
+		// Segunda mitad: noche a día
+		activeCubemap = nightCubemapID;
+		alpha = (timeProgress - 0.5f) * 2.0f; // 0.0 -> 1.0
+	}
+
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapID);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, activeCubemap);
 	glDrawArrays(GL_TRIANGLES, 0, 36);
+
 	glBindVertexArray(0);
 
 	glDepthFunc(prevDepthFunc);
 	glUseProgram(0);
 }
 
+void Skybox::updateDayNightCycle(float deltaTime)
+{
+	timeProgress += deltaTime / dayNightCycleDuration;
+
+	// Hacer que el ciclo sea infinito
+	if (timeProgress >= 1.0f)
+	{
+		timeProgress = 0.0f;
+	}
+
+	// Determinar si es día o noche
+	if (timeProgress < 0.5f)
+	{
+		currentTimeOfDay = TimeOfDay::DAY;
+	}
+	else
+	{
+		currentTimeOfDay = TimeOfDay::NIGHT;
+	}
+}
+
 Skybox::~Skybox()
 {
-	if (cubemapID) glDeleteTextures(1, &cubemapID);
+	if (dayCubemapID) glDeleteTextures(1, &dayCubemapID);
+	if (nightCubemapID) glDeleteTextures(1, &nightCubemapID);
 	if (VBO) glDeleteBuffers(1, &VBO);
 	if (VAO) glDeleteVertexArrays(1, &VAO);
 }
