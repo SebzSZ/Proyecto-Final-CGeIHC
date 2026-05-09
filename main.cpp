@@ -125,55 +125,31 @@ int main()
 		// Texturas de día (Space Nebula Blue)
 		// Orden: RIGHT, LEFT, UP, DOWN, FRONT, BACK
 		{
-			"Textures/Space Skybox Pack/nebula/jettelly_space_nebulas_blue_RIGHT.png",
-			"Textures/Space Skybox Pack/nebula/jettelly_space_nebulas_blue_LEFT.png",
-			"Textures/Space Skybox Pack/nebula/jettelly_space_nebulas_blue_UP.png",
-			"Textures/Space Skybox Pack/nebula/jettelly_space_nebulas_blue_DOWN.png",
-			"Textures/Space Skybox Pack/nebula/jettelly_space_nebulas_blue_FRONT.png",
-			"Textures/Space Skybox Pack/nebula/jettelly_space_nebulas_blue_BACK.png"
+			"Textures/Skybox/jettelly_space_nebulas_blue_LEFT.png",
+			"Textures/Skybox/jettelly_space_nebulas_blue_RIGHT.png",
+			"Textures/Skybox/jettelly_space_nebulas_blue_UP.png",
+			"Textures/Skybox/jettelly_space_nebulas_blue_DOWN.png",
+			"Textures/Skybox/jettelly_space_nebulas_blue_FRONT.png",
+			"Textures/Skybox/jettelly_space_nebulas_blue_BACK.png"
 		},
 		// Texturas de noche (Space Nebula Blue)
 		// Orden: RIGHT, LEFT, UP, DOWN, FRONT, BACK
 		{
-			"Textures/Space Skybox Pack/nebula/jettelly_space_nebulas_blue_RIGHT.png",
-			"Textures/Space Skybox Pack/nebula/jettelly_space_nebulas_blue_LEFT.png",
-			"Textures/Space Skybox Pack/nebula/jettelly_space_nebulas_blue_UP.png",
-			"Textures/Space Skybox Pack/nebula/jettelly_space_nebulas_blue_DOWN.png",
-			"Textures/Space Skybox Pack/nebula/jettelly_space_nebulas_blue_FRONT.png",
-			"Textures/Space Skybox Pack/nebula/jettelly_space_nebulas_blue_BACK.png"
+			"Textures/Skybox/jettelly_space_nebulas_black_LEFT.png",
+			"Textures/Skybox/jettelly_space_nebulas_black_RIGHT.png",
+			"Textures/Skybox/jettelly_space_nebulas_black_UP.png",
+			"Textures/Skybox/jettelly_space_nebulas_black_DOWN.png",
+			"Textures/Skybox/jettelly_space_nebulas_black_FRONT.png",
+			"Textures/Skybox/jettelly_space_nebulas_black_BACK.png"
 		},
 		SKYBOX_VERT, SKYBOX_FRAG
 	);
 
 	// Configurar duración del ciclo día-noche (30 segundos para el ciclo completo)
 	skybox.setDayNightCycleDuration(30.0f);
-    // Skybox con ciclo día/noche
-    Skybox skybox;
-    skybox.create(
-        // Texturas de día
-        {
-            "Textures/Skybox/cupertin-lake_rt.tga",
-            "Textures/Skybox/cupertin-lake_lf.tga",
-            "Textures/Skybox/cupertin-lake_up.tga",
-            "Textures/Skybox/cupertin-lake_dn.tga",
-            "Textures/Skybox/cupertin-lake_bk.tga",
-            "Textures/Skybox/cupertin-lake_ft.tga"
-        },
-        // Texturas de noche
-        {
-            "Textures/Skybox/cupertin-lake_rt.tga",
-            "Textures/Skybox/cupertin-lake_lf.tga",
-            "Textures/Skybox/cupertin-lake_up.tga",
-            "Textures/Skybox/cupertin-lake_dn.tga",
-            "Textures/Skybox/cupertin-lake_bk.tga",
-            "Textures/Skybox/cupertin-lake_ft.tga"
-        },
-        SKYBOX_VERT, SKYBOX_FRAG
-    );
-    skybox.setDayNightCycleDuration(30.0f);
 
     // Texturas y materiales
-    Texture floorTexture("Textures/piso.tga");
+    Texture floorTexture("Textures/naka_yuka_01_52D00-DXT1.png");
     floorTexture.loadWithAlpha();
     Material matOpaco(0.2f, 4.0f);
     Material matBrillante(1.0f, 32.0f);
