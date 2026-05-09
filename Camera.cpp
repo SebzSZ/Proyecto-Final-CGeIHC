@@ -132,7 +132,7 @@ void Camera::updateAerialCamera(const InputManager& input, GLfloat deltaTime)
 
 	GLfloat velocity = aerialMoveSpeed * deltaTime;
 
-	// Movimiento en el plano XZ (aéreo)
+	// Movimiento en el plano XZ (aéreo) - como movimiento aéreo libre
 	if (input.isKeyDown(GLFW_KEY_W)) aerialPosition.z += velocity;
 	if (input.isKeyDown(GLFW_KEY_S)) aerialPosition.z -= velocity;
 	if (input.isKeyDown(GLFW_KEY_A)) aerialPosition.x -= velocity;
@@ -142,13 +142,25 @@ void Camera::updateAerialCamera(const InputManager& input, GLfloat deltaTime)
 	if (input.isKeyDown(GLFW_KEY_Q)) aerialPosition.y += velocity;
 	if (input.isKeyDown(GLFW_KEY_E)) aerialPosition.y -= velocity;
 
-	// Mantener altura mínima
+	// Limites de altura (máximo 50, mínimo 5)
+	if (aerialPosition.y > 50.0f) aerialPosition.y = 50.0f;
 	if (aerialPosition.y < 5.0f) aerialPosition.y = 5.0f;
+
+	// Limites de mapa (aproximados al escenario)
+	const float MAP_LIMIT = 70.0f;
+	if (aerialPosition.x > MAP_LIMIT) aerialPosition.x = MAP_LIMIT;
+	if (aerialPosition.x < -MAP_LIMIT) aerialPosition.x = -MAP_LIMIT;
+	if (aerialPosition.z > MAP_LIMIT) aerialPosition.z = MAP_LIMIT;
+	if (aerialPosition.z < -MAP_LIMIT) aerialPosition.z = -MAP_LIMIT;
 
 	position = aerialPosition;
 
-	// Mirar hacia abajo en ángulo
-	lookAt(glm::vec3(aerialPosition.x, 0.0f, aerialPosition.z));
+	// Mirar hacia abajo en ángulo (hacia el punto central del mapa)
+	glm::vec3 targetPoint = glm::vec3(0.0f, 0.0f, 0.0f); // Centro del escenario
+	glm::vec3 dirToTarget = glm::normalize(targetPoint - aerialPosition);
+
+	// Interpolar suavemente hacia el punto objetivo
+	lookAt(aerialPosition + dirToTarget * 30.0f);
 	pitch = -45.0f; // Ángulo hacia abajo
 	update();
 }
