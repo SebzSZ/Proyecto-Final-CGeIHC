@@ -10,9 +10,9 @@
 
 enum class CameraMode
 {
-	THIRD_PERSON,	// Sigue al personaje
-	AERIAL,			// Vista aérea libre
-	INTEREST_POINT	// Puntos de interés
+	THIRD_PERSON,
+	AERIAL,	
+	INTEREST_POINT
 };
 
 class Camera
@@ -51,6 +51,10 @@ public:
 	void nextInterestPoint();
 	void updateInterestPointCamera(GLfloat deltaTime);
 
+	// Transición genérica entre modos
+	void setTransitionTarget(const glm::vec3& targetPos, const glm::vec3& targetLookAt);
+	bool isInModeTransition() const { return inModeTransition; }
+
 	~Camera();
 
 private:
@@ -68,11 +72,11 @@ private:
 	// Para seguimiento suave
 	glm::vec3 targetPosition;
 	GLfloat smoothSpeed = 5.0f;
-	GLfloat thirdPersonDistance = 5.0f;
-	GLfloat thirdPersonHeight = 3.0f;
-	GLfloat orbitAngle = 0.0f;				// Ángulo de órbita alrededor del personaje
-	GLfloat orbitSpeed = 45.0f;				// Grados por segundo
-	bool autoOrbit = false;					// Órbita automática (desactivada)
+	GLfloat thirdPersonDistance = 2.5f;
+	GLfloat thirdPersonHeight = 1.0f;
+	GLfloat orbitAngle = 0.0f;
+	GLfloat orbitSpeed = 45.0f;	
+	bool autoOrbit = false;
 	GLfloat manualOrbitSensitivity = 100.0f;
 
 	// Para cámara aérea
@@ -94,7 +98,18 @@ private:
 	glm::vec3 interestPointStartLookAt;
 
 	CameraMode currentMode = CameraMode::THIRD_PERSON;
+	CameraMode pendingMode = CameraMode::THIRD_PERSON;
+
+	// Transición genérica entre modos
+	bool inModeTransition = false;
+	GLfloat modeTransitionTime = 0.0f;
+	GLfloat modeTransitionDuration = 2.0f;
+	glm::vec3 transitionStartPos;
+	glm::vec3 transitionStartLookAt;
+	glm::vec3 transitionTargetPos;
+	glm::vec3 transitionTargetLookAt;
 
 	void update();
 	void lookAt(const glm::vec3& target);
+	bool updateModeTransition(GLfloat deltaTime);
 };
