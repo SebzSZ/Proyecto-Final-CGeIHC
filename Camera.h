@@ -4,8 +4,16 @@
 #include <glfw3.h>
 #include <glm.hpp>
 #include <gtc/matrix_transform.hpp>
+#include <vector>
 
 #include "InputManager.h"
+
+enum class CameraMode
+{
+	THIRD_PERSON,	// Sigue al personaje
+	AERIAL,			// Vista aérea libre
+	INTEREST_POINT	// Puntos de interés
+};
 
 class Camera
 {
@@ -21,6 +29,28 @@ public:
 	glm::vec3 getPosition() const { return position; }
 	glm::vec3 getDirection() const { return glm::normalize(front); }
 
+	// Modos de cámara
+	void setCameraMode(CameraMode mode);
+	CameraMode getCameraMode() const { return currentMode; }
+
+	// Control de cámara de 3era persona
+	void updateThirdPersonCamera(const glm::vec3& targetPosition, GLfloat deltaTime);
+
+	// Control de órbita
+	void setAutoOrbit(bool enabled) { autoOrbit = enabled; }
+	bool isAutoOrbitEnabled() const { return autoOrbit; }
+	void rotateOrbit(GLfloat deltaAngle) { orbitAngle += deltaAngle; }
+	void setOrbitSpeed(GLfloat speed) { orbitSpeed = speed; }
+	GLfloat getOrbitAngle() const { return orbitAngle; }
+
+	// Control de cámara aérea
+	void updateAerialCamera(const InputManager& input, GLfloat deltaTime);
+
+	// Control de puntos de interés
+	void addInterestPoint(const glm::vec3& point, const glm::vec3& lookAt);
+	void nextInterestPoint();
+	void updateInterestPointCamera(GLfloat deltaTime);
+
 	~Camera();
 
 private:
@@ -35,5 +65,36 @@ private:
 	GLfloat moveSpeed;
 	GLfloat turnSpeed;
 
+	// Para seguimiento suave
+	glm::vec3 targetPosition;
+	GLfloat smoothSpeed = 5.0f;
+	GLfloat thirdPersonDistance = 5.0f;
+	GLfloat thirdPersonHeight = 3.0f;
+	GLfloat orbitAngle = 0.0f;				// Ángulo de órbita alrededor del personaje
+	GLfloat orbitSpeed = 45.0f;				// Grados por segundo
+	bool autoOrbit = false;					// Órbita automática (desactivada)
+	GLfloat manualOrbitSensitivity = 100.0f;
+
+	// Para cámara aérea
+	GLfloat aerialHeight = 15.0f;
+	GLfloat aerialMoveSpeed = 15.0f;
+	glm::vec3 aerialPosition;
+
+	// Para puntos de interés
+	struct InterestPoint
+	{
+		glm::vec3 cameraPosition;
+		glm::vec3 lookAtPoint;
+	};
+	std::vector<InterestPoint> interestPoints;
+	int currentInterestPoint = 0;
+	GLfloat interestPointTransitionTime = 0.0f;
+	GLfloat interestPointTransitionDuration = 2.0f;
+	glm::vec3 interestPointStartPos;
+	glm::vec3 interestPointStartLookAt;
+
+	CameraMode currentMode = CameraMode::THIRD_PERSON;
+
 	void update();
+	void lookAt(const glm::vec3& target);
 };
