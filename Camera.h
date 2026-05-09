@@ -68,8 +68,8 @@ private:
 	// Para seguimiento suave
 	glm::vec3 targetPosition;
 	GLfloat smoothSpeed = 5.0f;
-	GLfloat thirdPersonDistance = 5.0f;
-	GLfloat thirdPersonHeight = 3.0f;
+	GLfloat thirdPersonDistance = 2.5f;
+	GLfloat thirdPersonHeight = 1.5f;
 	GLfloat orbitAngle = 0.0f;				// Ángulo de órbita alrededor del personaje
 	GLfloat orbitSpeed = 45.0f;				// Grados por segundo
 	bool autoOrbit = false;					// Órbita automática (desactivada)

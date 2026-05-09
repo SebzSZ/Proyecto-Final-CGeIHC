@@ -44,9 +44,9 @@ void Camera::keyControl(const InputManager& input, GLfloat deltaTime)
 
 void Camera::mouseControl(GLfloat xDelta, GLfloat yDelta)
 {
-	if (currentMode == CameraMode::THIRD_PERSON || currentMode == CameraMode::INTEREST_POINT)
+	if (currentMode == CameraMode::INTEREST_POINT)
 	{
-		// No se controla con ratón en estos modos
+		// No se controla con ratón en este modo
 		return;
 	}
 
@@ -110,20 +110,15 @@ void Camera::updateThirdPersonCamera(const glm::vec3& targetPosition, GLfloat de
 {
 	if (currentMode != CameraMode::THIRD_PERSON) return;
 
-	// Calcular posición en órbita alrededor del objetivo
-	GLfloat radiusX = thirdPersonDistance * cos(glm::radians(orbitAngle));
-	GLfloat radiusZ = thirdPersonDistance * sin(glm::radians(orbitAngle));
+	// Calcular posición de la cámara basada en yaw y pitch de la dirección en la que está viendo la cámara (front)
+	glm::vec3 offset = -front * thirdPersonDistance; 
+	// la colocamos a thirdPersonDistance de distancia detrás del personaje
 
-	glm::vec3 desiredPosition = targetPosition;
-	desiredPosition.x += radiusX;
-	desiredPosition.y += thirdPersonHeight;
-	desiredPosition.z += radiusZ;
+	glm::vec3 desiredPosition = targetPosition + offset;
+	desiredPosition.y = targetPosition.y + thirdPersonHeight;
 
-	// Interpolar suavemente hacia la posición deseada
-	position = glm::mix(position, desiredPosition, smoothSpeed * deltaTime);
-
-	// Mirar hacia el objetivo
-	lookAt(targetPosition + glm::vec3(0.0f, 1.0f, 0.0f));
+	// Mover la cámara a esa posición
+	position = desiredPosition;
 }
 
 void Camera::updateAerialCamera(const InputManager& input, GLfloat deltaTime)

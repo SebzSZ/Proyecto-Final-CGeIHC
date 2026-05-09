@@ -95,7 +95,15 @@ int main()
 
 	// Ruby
 	Model rubyModel;
-	if (!rubyModel.load("Models/ruby.obj")) return -1;
+	if (!rubyModel.load("Models/RubyCuerpo.obj")) return -1;
+	Model rubyLeftArm;
+	if (!rubyLeftArm.load("Models/RubyBrazoIzq.obj")) return -1;
+	Model rubyRightArm;
+	if (!rubyRightArm.load("Models/RubyBrazoDer.obj")) return -1;
+	Model rubyLeftLeg;
+	if (!rubyLeftLeg.load("Models/RubyPiernaIzq.obj")) return -1;
+	Model rubyRightLeg;
+	if (!rubyRightLeg.load("Models/RubyPiernaDer.obj")) return -1;
 
     Material matBrillante(1.0f, 32.0f);
     
@@ -115,6 +123,33 @@ int main()
     rubyObj->setMaterial(&matOpaco);
     rubyObj->transform.setPosition(0.0f, 1.0f, 0.0f);
     rubyObj->transform.setScale(5.0f);
+
+	// Brazos y piernas de Ruby como hijos del objeto principal
+	std::shared_ptr<GameObject> leftArm = std::make_shared<GameObject>("LeftArm", GameObjectType::MODEL);
+	leftArm->setModel(&rubyLeftArm);
+	leftArm->transform.setPosition(0.025f, 0.0611f, 0.0f);
+	leftArm->transform.setRotation(0.0f, 0.0f, -65.0f);
+	rubyObj->addChild(leftArm);
+
+	std::shared_ptr<GameObject> rightArm = std::make_shared<GameObject>("RightArm", GameObjectType::MODEL);
+	rightArm->setModel(&rubyRightArm);
+	rightArm->transform.setPosition(-0.025f, 0.0611f, 0.0f);
+	rightArm->transform.setRotation(0.0f, 0.0f, 65.0f);
+	rubyObj->addChild(rightArm);
+
+	std::shared_ptr<GameObject> leftLeg = std::make_shared<GameObject>("LeftLeg", GameObjectType::MODEL);
+	leftLeg->setModel(&rubyLeftLeg);
+	rubyObj->addChild(leftLeg);
+
+	std::shared_ptr<GameObject> rightLeg = std::make_shared<GameObject>("RightLeg", GameObjectType::MODEL);
+	rightLeg->setModel(&rubyRightLeg);
+	rubyObj->addChild(rightLeg);
+
+	// Atributo para animar los brazos de Ruby
+	float walkTime = 0.0f;
+	float walkSpeed = 10.0f;
+	float walkAmplitude = 35.0f;
+	float angleThigh = 0.0f;
 
     // Luz direccional
     DirectionalLight directionalLight(
@@ -203,23 +238,14 @@ int main()
 		switch (camera.getCameraMode())
 		{
 			case CameraMode::THIRD_PERSON:
+				camera.mouseControl(input.getMouseDeltaX() * 0.5f, input.getMouseDeltaY() * 0.5f);
 				camera.updateThirdPersonCamera(rubyObj->transform.getPosition(), deltaTime);
-
-				// Controles de órbita en modo 3era persona
-				if (input.isKeyDown(GLFW_KEY_Q))
-					camera.rotateOrbit(-150.0f * deltaTime); // Rotar izquierda
-				if (input.isKeyDown(GLFW_KEY_E))
-					camera.rotateOrbit(150.0f * deltaTime);  // Rotar derecha
-
-				// Control con ratón (movimiento horizontal)
-				camera.rotateOrbit(input.getMouseDeltaX() * 0.5f);
-
 				break;
 			case CameraMode::AERIAL:
-				camera.updateAerialCamera(input, deltaTime);
+				// TODO: Implementar cámara aérea
 				break;
 			case CameraMode::INTEREST_POINT:
-				camera.updateInterestPointCamera(deltaTime);
+				// TODO: Implementar cámara de puntos de interés
 				break;
 		}
 
@@ -234,29 +260,53 @@ int main()
 		// Calcular dirección perpendicular (izquierda/derecha)
 		glm::vec3 rightDirection = glm::normalize(glm::cross(moveDirection, glm::vec3(0.0f, 1.0f, 0.0f)));
 
+		bool isWalking = false;
+
 		if (input.isKeyDown(GLFW_KEY_W))
 		{
 			glm::vec3 movement = moveDirection * rubyMoveSpeed * deltaTime;
 			rubyObj->transform.translate(movement.x, 0.0f, movement.z);
+			isWalking = true;
 		}
 
 		if (input.isKeyDown(GLFW_KEY_S))
 		{
 			glm::vec3 movement = moveDirection * rubyMoveSpeed * deltaTime;
 			rubyObj->transform.translate(-movement.x, 0.0f, -movement.z);
+			isWalking = true;
 		}
 
 		if (input.isKeyDown(GLFW_KEY_A))
 		{
 			glm::vec3 movement = rightDirection * rubyMoveSpeed * deltaTime;
 			rubyObj->transform.translate(-movement.x, 0.0f, -movement.z);
+			isWalking = true;
 		}
 
 		if (input.isKeyDown(GLFW_KEY_D))
 		{
 			glm::vec3 movement = rightDirection * rubyMoveSpeed * deltaTime;
 			rubyObj->transform.translate(movement.x, 0.0f, movement.z);
+			isWalking = true;
 		}
+
+		// Animar brazos de Ruby al caminar
+		if (isWalking)
+		{
+			walkTime += deltaTime * walkSpeed;
+			angleThigh = walkAmplitude * sin(walkTime);
+		}
+		else
+		{
+			walkTime = 0.0f;
+			// Regreso suave: disminuir el ángulo hacia 0 gradualmente usando interpolación lineal
+			angleThigh += (0.0f - angleThigh) * 8.0f * deltaTime;
+		}
+
+		leftArm->transform.setRotation(angleThigh, 0.0f, -65.0f);
+		rightArm->transform.setRotation(-angleThigh, 0.0f, 65.0f);
+		leftLeg->transform.setRotation(-angleThigh, 0.0f, 0.0f);
+		rightLeg->transform.setRotation(angleThigh, 0.0f, 0.0f);
 
 		// Hacer girar a Ruby hacia donde está mirando la cámara
 		glm::vec3 rubyDirection = glm::normalize(glm::vec3(cameraDirection.x, 0.0f, cameraDirection.z));
