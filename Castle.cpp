@@ -189,5 +189,5 @@ bool Castle::Initialize(Material& matOpaco)
 	floor4Obj->transform.setScale(60.0f, 1.0f, 31.1f);
 	castleObj->addChild(floor4Obj);
 
-	return true; // Éxito al cargar
+	return true; 
 }
