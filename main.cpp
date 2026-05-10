@@ -28,6 +28,10 @@
 #include "Train.h"
 #include "Castle.h"
 
+// --- INTEGRACION NAVE ---
+#include "Nave.h"
+// ------------------------
+
 // Rutas de shaders
 static const char* VERT_SHADER = "shaders/shader.vert";
 static const char* FRAG_SHADER = "shaders/shader.frag";
@@ -109,7 +113,7 @@ int main()
 
     // Reproducir música
     audioManager.loadMP3("bgMusic", "Sounds/bgMusic.mp3");
-    audioManager.play("bgMusic", true, 0.5f);
+    //audioManager.play("bgMusic", true, 0.5f);
 
     // Configuración inicial de la cámara
     Camera camera(glm::vec3(0.0f, 5.0f, 5.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, 0.0f, 5.0f, 0.1f);
@@ -119,34 +123,32 @@ int main()
     Shader shader;
     shader.createFromFiles(VERT_SHADER, FRAG_SHADER);
 
-	// Creación del skybox con texturas de día y noche (ambas con Space)
-	Skybox skybox;
-	skybox.create(
-		// Texturas de día (Space Nebula Blue)
-		// Orden: RIGHT, LEFT, UP, DOWN, FRONT, BACK
-		{
-			"Textures/Skybox/jettelly_space_nebulas_blue_LEFT.png",
-			"Textures/Skybox/jettelly_space_nebulas_blue_RIGHT.png",
-			"Textures/Skybox/jettelly_space_nebulas_blue_UP.png",
-			"Textures/Skybox/jettelly_space_nebulas_blue_DOWN.png",
-			"Textures/Skybox/jettelly_space_nebulas_blue_FRONT.png",
-			"Textures/Skybox/jettelly_space_nebulas_blue_BACK.png"
-		},
-		// Texturas de noche (Space Nebula Blue)
-		// Orden: RIGHT, LEFT, UP, DOWN, FRONT, BACK
-		{
-			"Textures/Skybox/jettelly_space_nebulas_black_LEFT.png",
-			"Textures/Skybox/jettelly_space_nebulas_black_RIGHT.png",
-			"Textures/Skybox/jettelly_space_nebulas_black_UP.png",
-			"Textures/Skybox/jettelly_space_nebulas_black_DOWN.png",
-			"Textures/Skybox/jettelly_space_nebulas_black_FRONT.png",
-			"Textures/Skybox/jettelly_space_nebulas_black_BACK.png"
-		},
-		SKYBOX_VERT, SKYBOX_FRAG
-	);
+    // Creación del skybox con texturas de día y noche (ambas con Space)
+    Skybox skybox;
+    skybox.create(
+        // Texturas de día (Space Nebula Blue)
+        {
+            "Textures/Skybox/jettelly_space_nebulas_blue_LEFT.png",
+            "Textures/Skybox/jettelly_space_nebulas_blue_RIGHT.png",
+            "Textures/Skybox/jettelly_space_nebulas_blue_UP.png",
+            "Textures/Skybox/jettelly_space_nebulas_blue_DOWN.png",
+            "Textures/Skybox/jettelly_space_nebulas_blue_FRONT.png",
+            "Textures/Skybox/jettelly_space_nebulas_blue_BACK.png"
+        },
+        // Texturas de noche (Space Nebula Blue)
+        {
+            "Textures/Skybox/jettelly_space_nebulas_black_LEFT.png",
+            "Textures/Skybox/jettelly_space_nebulas_black_RIGHT.png",
+            "Textures/Skybox/jettelly_space_nebulas_black_UP.png",
+            "Textures/Skybox/jettelly_space_nebulas_black_DOWN.png",
+            "Textures/Skybox/jettelly_space_nebulas_black_FRONT.png",
+            "Textures/Skybox/jettelly_space_nebulas_black_BACK.png"
+        },
+        SKYBOX_VERT, SKYBOX_FRAG
+    );
 
-	// Configurar duración del ciclo día-noche (30 segundos para el ciclo completo)
-	skybox.setDayNightCycleDuration(30.0f);
+    // Configurar duración del ciclo día-noche (30 segundos para el ciclo completo)
+    skybox.setDayNightCycleDuration(30.0f);
 
     // Texturas y materiales
     Texture floorTexture("Textures/naka_yuka_01_52D00-DXT1.png");
@@ -192,6 +194,13 @@ int main()
     float trainSpeed = 5.0f;
     float wheelRotationSpeed = 200.0f;
 
+    // --- INTEGRACION NAVE ---
+    Nave nave;
+    if (!nave.Initialize(matOpaco)) return -1;
+    nave.SetKeyframesIniciales();
+    nave.DisplayMenu();
+    // ------------------------
+
     // Avatar: Ruby
 
     // Variables para las extremidades
@@ -224,7 +233,7 @@ int main()
     glm::vec3 bigTower1Pos(16.84f, 8.92f, -9.0f);
     camera.addInterestPoint(
         bigTower1Pos + glm::vec3(15.0f, 8.0f, 15.0f),
-        bigTower1Pos + glm::vec3(0.0f, 5.0f, 0.0f) 
+        bigTower1Pos + glm::vec3(0.0f, 5.0f, 0.0f)
     );
 
     // Punto de Interés 2: Entrada del Castillo (Vista General)
@@ -262,9 +271,9 @@ int main()
         skybox.updateDayNightCycle(deltaTime);
 
         // Input
-        glfwPollEvents();
         InputManager& input = InputManager::getInstance();
         input.beginFrame();
+        glfwPollEvents();
 
         // Cambio de modo de cámara (C, V, B)
         if (input.isKeyDown(GLFW_KEY_C))
@@ -341,6 +350,10 @@ int main()
 
         // Movimiento del tren
         train.Update(trainSpeed, deltaTime, wheelRotationSpeed);
+
+        // --- INTEGRACION NAVE ---
+        nave.Update(deltaTime);
+        // ------------------------
 
         // Movimiento de Ruby — solo en modo THIRD_PERSON y sin transición activa
         float rubyMoveSpeed = 8.0f;
@@ -453,18 +466,19 @@ int main()
 
         shader.setDirectionalLight(&directionalLight);
 
-		// Renderizar objetos
-		floorObj->draw(shader);
-
-		
         // Objetos de la escena
         floorObj->draw(shader);
-        
+
         // Render del castillo
         castle.GetCastleObject()->draw(shader);
 
         // Render del tren
         train.GetTrainObject()->draw(shader);
+
+        // --- INTEGRACION NAVE ---
+        // Render de la nave usando el location del modelo del nuevo shader
+		nave.GetNaveObject()->draw(shader);
+        // ------------------------
 
         // Ruby
         glEnable(GL_BLEND);
