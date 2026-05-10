@@ -1,4 +1,11 @@
-﻿#include <glew.h>
+﻿/*
+* Proyecto Final - CGeIHC
+* Buendía López Sebastián - 320014932
+* Hernández Pérez Mariana Daniela - 320180657
+* Ortega Novoa Octavio - 317147768
+*/
+
+#include <glew.h>
 #include <glfw3.h>
 #include <glm.hpp>
 #include <gtc/matrix_transform.hpp>
@@ -21,64 +28,119 @@
 #include "Train.h"
 #include "Castle.h"
 
-// Rutas de recursos
+// Rutas de shaders
 static const char* VERT_SHADER = "shaders/shader.vert";
 static const char* FRAG_SHADER = "shaders/shader.frag";
 static const char* SKYBOX_VERT = "shaders/skybox.vert";
 static const char* SKYBOX_FRAG = "shaders/skybox.frag";
 
-// Plano del piso
+// Geometría del piso
 static GLfloat FLOOR_VERTS[] = {
-	//  x      y      z      u      v      nx    ny    nz
-	   -1.0f,  0.0f, -1.0f,  0.0f, 10.0f,  0.0f, 1.0f, 0.0f,
-		1.0f,  0.0f, -1.0f, 10.0f, 10.0f,  0.0f, 1.0f, 0.0f,
-		1.0f,  0.0f,  1.0f, 10.0f,  0.0f,  0.0f, 1.0f, 0.0f,
-	   -1.0f,  0.0f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f, 0.0f,
+    //  x      y      z      u      v      nx    ny    nz
+       -1.0f,  0.0f, -1.0f,  0.0f, 10.0f,  0.0f, 1.0f, 0.0f,
+        1.0f,  0.0f, -1.0f, 10.0f, 10.0f,  0.0f, 1.0f, 0.0f,
+        1.0f,  0.0f,  1.0f, 10.0f,  0.0f,  0.0f, 1.0f, 0.0f,
+       -1.0f,  0.0f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f, 0.0f,
 };
 static GLuint FLOOR_IDX[] = { 0, 1, 2,  0, 2, 3 };
 
+// CreateAvatar
+// Construir la jerarquía del avatar (Ruby)
+std::shared_ptr<GameObject> CreateAvatar(
+    Material& matOpaco,
+    Model& rubyModel,
+    Model& rubyLeftArm,
+    Model& rubyRightArm,
+    Model& rubyLeftLeg,
+    Model& rubyRightLeg,
+    Model& rubyCape,
+    std::shared_ptr<GameObject>& leftArm,
+    std::shared_ptr<GameObject>& rightArm,
+    std::shared_ptr<GameObject>& leftLeg,
+    std::shared_ptr<GameObject>& rightLeg,
+    std::shared_ptr<GameObject>& cape)
+{
+    // Cuerpo raíz
+    std::shared_ptr<GameObject> rubyObj = std::make_shared<GameObject>("Ruby", GameObjectType::MODEL);
+    rubyObj->setModel(&rubyModel);
+    rubyObj->setMaterial(&matOpaco);
+    rubyObj->transform.setPosition(20.0f, 1.2f, 1.64f);
+    rubyObj->transform.setScale(5.0f);
+
+    // Extremidades — hijos de rubyObj
+    leftArm = std::make_shared<GameObject>("LeftArm", GameObjectType::MODEL);
+    leftArm->setModel(&rubyLeftArm);
+    leftArm->transform.setPosition(0.025f, 0.0611f, 0.0f);
+    leftArm->transform.setRotation(0.0f, 0.0f, -65.0f);
+    rubyObj->addChild(leftArm);
+
+    rightArm = std::make_shared<GameObject>("RightArm", GameObjectType::MODEL);
+    rightArm->setModel(&rubyRightArm);
+    rightArm->transform.setPosition(-0.025f, 0.0611f, 0.0f);
+    rightArm->transform.setRotation(0.0f, 0.0f, 65.0f);
+    rubyObj->addChild(rightArm);
+
+    leftLeg = std::make_shared<GameObject>("LeftLeg", GameObjectType::MODEL);
+    leftLeg->setModel(&rubyLeftLeg);
+    rubyObj->addChild(leftLeg);
+
+    rightLeg = std::make_shared<GameObject>("RightLeg", GameObjectType::MODEL);
+    rightLeg->setModel(&rubyRightLeg);
+    rubyObj->addChild(rightLeg);
+
+    cape = std::make_shared<GameObject>("Cape", GameObjectType::MODEL);
+    cape->setModel(&rubyCape);
+    cape->transform.setPosition(0.0f, 0.065f, -0.01f);
+    rubyObj->addChild(cape);
+
+    return rubyObj;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 int main()
 {
-	// Crear ventana
-	Window mainWindow("Proyecto Final - CGeIHC");
-	if (mainWindow.Initialize() != 0) return -1;
+    // Creación de la ventana
+    Window mainWindow("Proyecto Final - CGeIHC");
+    if (mainWindow.Initialize() != 0) return -1;
 
-	AudioManager& audioManager = AudioManager::getInstance();
-	if (!audioManager.Initialize()) return -1;
+    // Instancia de audio
+    AudioManager& audioManager = AudioManager::getInstance();
+    if (!audioManager.Initialize()) return -1;
 
-	audioManager.loadMP3("bgMusic", "Sounds/bgMusic.mp3");
-	//audioManager.play("bgMusic", true, 0.5f);
+    // Reproducir música
+    audioManager.loadMP3("bgMusic", "Sounds/bgMusic.mp3");
+    audioManager.play("bgMusic", true, 0.5f);
 
-	// Configurar cámara
-	Camera camera(glm::vec3(0.0f, 5.0f, 5.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, 0.0f, 5.0f, 0.1f);
+    // Configuración inicial de la cámara
+    Camera camera(glm::vec3(0.0f, 5.0f, 5.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, 0.0f, 5.0f, 0.1f);
+    camera.setCameraMode(CameraMode::THIRD_PERSON);
 
-	// Iniciar en modo 3era persona
-	camera.setCameraMode(CameraMode::THIRD_PERSON);
+    // Shader
+    Shader shader;
+    shader.createFromFiles(VERT_SHADER, FRAG_SHADER);
 
-	// Creación de shader
-	Shader shader;
-	shader.createFromFiles(VERT_SHADER, FRAG_SHADER);
-
-	// Creación del skybox con texturas de día y noche
+	// Creación del skybox con texturas de día y noche (ambas con Space)
 	Skybox skybox;
 	skybox.create(
-		// Texturas de día
+		// Texturas de día (Space Nebula Blue)
+		// Orden: RIGHT, LEFT, UP, DOWN, FRONT, BACK
 		{
-			"Textures/Skybox/cupertin-lake_rt.tga",
-			"Textures/Skybox/cupertin-lake_lf.tga",
-			"Textures/Skybox/cupertin-lake_up.tga",
-			"Textures/Skybox/cupertin-lake_dn.tga",
-			"Textures/Skybox/cupertin-lake_bk.tga",
-			"Textures/Skybox/cupertin-lake_ft.tga"
+			"Textures/Skybox/jettelly_space_nebulas_blue_LEFT.png",
+			"Textures/Skybox/jettelly_space_nebulas_blue_RIGHT.png",
+			"Textures/Skybox/jettelly_space_nebulas_blue_UP.png",
+			"Textures/Skybox/jettelly_space_nebulas_blue_DOWN.png",
+			"Textures/Skybox/jettelly_space_nebulas_blue_FRONT.png",
+			"Textures/Skybox/jettelly_space_nebulas_blue_BACK.png"
 		},
-		// Texturas de noche
+		// Texturas de noche (Space Nebula Blue)
+		// Orden: RIGHT, LEFT, UP, DOWN, FRONT, BACK
 		{
-			"Textures/Skybox/cupertin-lake_rt.tga",
-			"Textures/Skybox/cupertin-lake_lf.tga",
-			"Textures/Skybox/cupertin-lake_up.tga",
-			"Textures/Skybox/cupertin-lake_dn.tga",
-			"Textures/Skybox/cupertin-lake_bk.tga",
-			"Textures/Skybox/cupertin-lake_ft.tga"
+			"Textures/Skybox/jettelly_space_nebulas_black_LEFT.png",
+			"Textures/Skybox/jettelly_space_nebulas_black_RIGHT.png",
+			"Textures/Skybox/jettelly_space_nebulas_black_UP.png",
+			"Textures/Skybox/jettelly_space_nebulas_black_DOWN.png",
+			"Textures/Skybox/jettelly_space_nebulas_black_FRONT.png",
+			"Textures/Skybox/jettelly_space_nebulas_black_BACK.png"
 		},
 		SKYBOX_VERT, SKYBOX_FRAG
 	);
@@ -86,300 +148,334 @@ int main()
 	// Configurar duración del ciclo día-noche (30 segundos para el ciclo completo)
 	skybox.setDayNightCycleDuration(30.0f);
 
-	// Crear piso con Mesh
-	Mesh floorMesh;
-	floorMesh.create(FLOOR_VERTS, FLOOR_IDX, 32, 6);
+    // Texturas y materiales
+    Texture floorTexture("Textures/naka_yuka_01_52D00-DXT1.png");
+    floorTexture.loadWithAlpha();
+    Material matOpaco(0.2f, 4.0f);
+    Material matBrillante(1.0f, 32.0f);
 
-	Texture floorTexture("Textures/piso.tga");
-	floorTexture.loadWithAlpha();
+    // Modelos
 
-	Material matOpaco(0.2f, 4.0f);
-	Material matBrillante(1.0f, 32.0f);
+    // Ruby — partes del avatar
+    Model rubyModel;    if (!rubyModel.load("Models/RubyCuerpo.obj"))      return -1;
+    Model rubyLeftArm;  if (!rubyLeftArm.load("Models/RubyBrazoIzq.obj"))  return -1;
+    Model rubyRightArm; if (!rubyRightArm.load("Models/RubyBrazoDer.obj")) return -1;
+    Model rubyLeftLeg;  if (!rubyLeftLeg.load("Models/RubyPiernaIzq.obj")) return -1;
+    Model rubyRightLeg; if (!rubyRightLeg.load("Models/RubyPiernaDer.obj")) return -1;
+    Model rubyCape;     if (!rubyCape.load("Models/RubyCapa.obj"))         return -1;
 
-	// Nave
-	Model nave;
-	if (!nave.load("Models/nave.obj")) return -1;
+    // Castillo de Hyrule — partes del escenario
+    Model mainRoom;  if (!mainRoom.load("Models/HyruleCastle_MainRoom.obj")) return -1;
+    Model bigTower;  if (!bigTower.load("Models/HyruleCastle_BigTower.obj")) return -1;
+    Model wall;      if (!wall.load("Models/HyruleCastle_Wall.obj"))         return -1;
+    Model midTower;  if (!midTower.load("Models/HyruleCastle_MidTower.obj")) return -1;
+    Model floor;     if (!floor.load("Models/HyruleCastle_Floor.obj"))       return -1;
 
-	// Ruby
-	Model rubyModel;
-	if (!rubyModel.load("Models/ruby.obj")) return -1;
+    // GameObjects de la escena
 
-	// Objeto Piso
-	std::shared_ptr<GameObject> floorObj = std::make_shared<GameObject>("Floor", GameObjectType::MESH);
-	MeshData floorData;
-	floorData.vertices = std::vector<GLfloat>(std::begin(FLOOR_VERTS), std::end(FLOOR_VERTS));
-	floorData.indices = std::vector<GLuint>(std::begin(FLOOR_IDX), std::end(FLOOR_IDX));
-	floorObj->loadMesh(floorData);
-	floorObj->setTextureID(floorTexture.getID());
-	floorObj->setMaterial(&matOpaco);
-	floorObj->transform.setScale(50.0f, 1.0f, 50.0f);
+    // Piso de la escena
+    std::shared_ptr<GameObject> floorObj = std::make_shared<GameObject>("Floor", GameObjectType::MESH);
+    MeshData floorData;
+    floorData.vertices = std::vector<GLfloat>(std::begin(FLOOR_VERTS), std::end(FLOOR_VERTS));
+    floorData.indices = std::vector<GLuint>(std::begin(FLOOR_IDX), std::end(FLOOR_IDX));
+    floorObj->loadMesh(floorData);
+    floorObj->setTextureID(floorTexture.getID());
+    floorObj->setMaterial(&matOpaco);
+    floorObj->transform.setScale(50.0f, 1.0f, 50.0f);
 
-	// Objeto Nave
-	std::shared_ptr<GameObject> naveObj = std::make_shared<GameObject>("Nave", GameObjectType::MODEL);
-	naveObj->setModel(&nave);
-	naveObj->setMaterial(&matBrillante);
-	naveObj->transform.setPosition(0.0f, 2.0f, -5.0f);
-	naveObj->transform.setScale(2.5f);
+    Castle castle;
+    if (!castle.Initialize(matOpaco)) return -1;
 
-	// Objeto Ruby
-	std::shared_ptr<GameObject> rubyObj = std::make_shared<GameObject>("Ruby", GameObjectType::MODEL);
-	rubyObj->setModel(&rubyModel);
-	rubyObj->setMaterial(&matOpaco);
-	rubyObj->transform.setPosition(0.0f, 1.0f, 0.0f);
-	rubyObj->transform.setScale(5.0f);
+    Train train;
+    if (!train.Initialize(matOpaco)) return -1;
 
-	Castle castle;
-	if (!castle.Initialize(matOpaco)) return -1;
+    float trainSpeed = 5.0f;
+    float wheelRotationSpeed = 200.0f;
 
-	Train train;
-	if (!train.Initialize(matOpaco)) return -1;
+    // Avatar: Ruby
 
-	float naveSpeed = 8.0f;
-	float trainSpeed = 5.0f;
-	float wheelRotationSpeed = 200.0f;
+    // Variables para las extremidades
+    std::shared_ptr<GameObject> leftArm;
+    std::shared_ptr<GameObject> rightArm;
+    std::shared_ptr<GameObject> leftLeg;
+    std::shared_ptr<GameObject> rightLeg;
+    std::shared_ptr<GameObject> cape;
 
-	// Luz direccional
-	DirectionalLight directionalLight(
-		1.0f, 0.95f, 0.8f,
-		0.3f, 0.8f,
-		0.0f, -1.0f, -0.5f
-	);
+    // Creación del avatar
+    std::shared_ptr<GameObject> rubyObj = CreateAvatar(matOpaco, rubyModel, rubyLeftArm, rubyRightArm, rubyLeftLeg, rubyRightLeg, rubyCape, leftArm, rightArm, leftLeg, rightLeg, cape);
 
-	// Linterna que sigue a la cámara
-	SpotLight spotLights[MAX_SPOT_LIGHTS];
-	unsigned int spotLightCount = 0;
-	spotLights[0] = SpotLight(
-		1.0f, 1.0f, 1.0f,
-		0.4f, 1.0f,
-		0.0f, 0.0f, 0.0f,
-		0.0f, 0.0f, 0.0f,
-		1.0f, 0.005f, 0.0f,
-		15.0f
-	);
-	spotLightCount++;
+    // Estado de la animación de caminata
+    float walkTime = 0.0f;
+    float walkSpeed = 10.0f;
+    float walkAmplitude = 35.0f;
+    float angleThigh = 0.0f;
 
-	// Faro rojo de la nave
-	spotLights[1] = SpotLight(
-		1.0f, 0.0f, 0.0f,
-		1.0f, 1.0f,
-		0.0f, 0.0f, 0.0f,
-		0.0f, -1.0f, 0.0f,
-		1.0f, 0.1f, 0.03f,
-		20.0f
-	);
-	spotLightCount++;
+    // Luces
 
-	std::shared_ptr<GameObject> naveFaroDir = std::make_shared<GameObject>("NaveFaro", GameObjectType::SPOT_LIGHT);
-	naveFaroDir->setSpotLight(&spotLights[1]);
-	naveFaroDir->transform.setPosition(0.0f, -0.5f, 0.0f);
-	naveObj->addChild(naveFaroDir);
+    // Luz direccional
+    DirectionalLight directionalLight(
+        1.0f, 0.95f, 0.8f,
+        0.3f, 0.8f,
+        0.0f, -1.0f, -0.5f
+    );
 
-	// Configurar puntos de interés
-	glm::vec3 rubyPos = rubyObj->transform.getPosition();
-	// Punto 1: Vista frontal de Ruby
-	camera.addInterestPoint(rubyPos + glm::vec3(0.0f, 2.0f, 5.0f), rubyPos + glm::vec3(0.0f, 1.0f, 0.0f));
-	// Punto 2: Vista aérea general del escenario
-	camera.addInterestPoint(glm::vec3(0.0f, 25.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f));
-	// Punto 3: Vista lateral de Ruby
-	camera.addInterestPoint(rubyPos + glm::vec3(8.0f, 3.0f, 0.0f), rubyPos + glm::vec3(0.0f, 1.0f, 0.0f));
+    // Punto de Interés 1: Torre Grande Central
+    // Enfoca una de las torres principales del castillo desde una vista dinámica
+    glm::vec3 bigTower1Pos(16.84f, 8.92f, -9.0f);
+    camera.addInterestPoint(
+        bigTower1Pos + glm::vec3(15.0f, 8.0f, 15.0f),
+        bigTower1Pos + glm::vec3(0.0f, 5.0f, 0.0f) 
+    );
 
-	// Proyección
-	glm::mat4 projection = glm::perspective(
-		glm::radians(60.0f),
-		(float)mainWindow.getBufferWidth() / (float)mainWindow.getBufferHeight(),
-		0.1f, 500.0f
-	);
+    // Punto de Interés 2: Entrada del Castillo (Vista General)
+    // Muestra la entrada y la estructura general del castillo
+    glm::vec3 castleEntrancePos(20.0f, 5.0f, -8.0f);
+    camera.addInterestPoint(
+        castleEntrancePos + glm::vec3(-20.0f, 12.0f, 25.0f),
+        castleEntrancePos
+    );
 
-	// Matriz de modelo
-	glm::mat4 model(1.0f);
+    // Punto de Interés 3: Torres de Defensa Laterales
+    // Enfoca las torres medias de las esquinas del castillo
+    glm::vec3 lateralTowerPos(36.09f, 5.44f, -3.64f);
+    camera.addInterestPoint(
+        lateralTowerPos + glm::vec3(18.0f, 10.0f, 18.0f),
+        lateralTowerPos + glm::vec3(0.0f, 8.0f, 0.0f)
+    );
 
-	GLfloat lastTime = (GLfloat)glfwGetTime();
+    // Proyección
+    glm::mat4 projection = glm::perspective(glm::radians(60.0f), (float)mainWindow.getBufferWidth() / (float)mainWindow.getBufferHeight(), 0.1f, 500.0f);
 
-	// Loop principal
-	while (!mainWindow.shouldClose())
-	{
-		// Tiempo
-		GLfloat now = (GLfloat)glfwGetTime();
-		GLfloat deltaTime = now - lastTime;
-		lastTime = now;
+    // Matriz de modelo
+    glm::mat4 model(1.0f);
+    GLfloat lastTime = (GLfloat)glfwGetTime();
 
-		// Actualizar ciclo día-noche del skybox
-		skybox.updateDayNightCycle(deltaTime);
+    // Bucle principal
+    while (!mainWindow.shouldClose())
+    {
+        // Delta Time
+        GLfloat now = (GLfloat)glfwGetTime();
+        GLfloat deltaTime = now - lastTime;
+        lastTime = now;
 
-		// Input
-		glfwPollEvents();
-		InputManager& input = InputManager::getInstance();
-		input.beginFrame();
+        // Actualizar ciclo día-noche del skybox
+        skybox.updateDayNightCycle(deltaTime);
 
-		// Cambio de modo de cámara
-		if (input.isKeyPressed(GLFW_KEY_1))
-		{
-			camera.setCameraMode(CameraMode::THIRD_PERSON);
-			printf("[Camera] Modo: 3era Persona (Sigue el personaje)\n");
-			printf("[Orbita] Usa Q/E o el raton para rotar la camara alrededor de Ruby\n");
-		}
-		if (input.isKeyPressed(GLFW_KEY_2))
-		{
-			camera.setCameraMode(CameraMode::AERIAL);
-			printf("[Camera] Modo: Aéreo (Exploración libre)\n");
-		}
-		if (input.isKeyPressed(GLFW_KEY_3))
-		{
-			camera.setCameraMode(CameraMode::INTEREST_POINT);
-			printf("[Camera] Modo: Puntos de Interés\n");
-		}
+        // Input
+        glfwPollEvents();
+        InputManager& input = InputManager::getInstance();
+        input.beginFrame();
 
-		// Cambiar punto de interés con SPACE
-		if (input.isKeyPressed(GLFW_KEY_SPACE) && camera.getCameraMode() == CameraMode::INTEREST_POINT)
-		{
-			camera.nextInterestPoint();
-		}
+        // Cambio de modo de cámara (C, V, B)
+        if (input.isKeyDown(GLFW_KEY_C))
+        {
+            camera.setCameraMode(CameraMode::THIRD_PERSON);
+        }
 
-		// Actualizar cámara según modo
-		switch (camera.getCameraMode())
-		{
-		case CameraMode::THIRD_PERSON:
-			camera.updateThirdPersonCamera(rubyObj->transform.getPosition(), deltaTime);
+        if (input.isKeyDown(GLFW_KEY_V))
+        {
+            camera.setCameraMode(CameraMode::AERIAL);
+        }
 
-			// Controles de órbita en modo 3era persona
-			if (input.isKeyDown(GLFW_KEY_Q))
-				camera.rotateOrbit(-150.0f * deltaTime); // Rotar izquierda
-			if (input.isKeyDown(GLFW_KEY_E))
-				camera.rotateOrbit(150.0f * deltaTime);  // Rotar derecha
+        if (input.isKeyDown(GLFW_KEY_B))
+        {
+            camera.setCameraMode(CameraMode::INTEREST_POINT);
+        }
 
-			// Control con ratón (movimiento horizontal)
-			camera.rotateOrbit(input.getMouseDeltaX() * 0.5f);
+        // Avanzar al siguiente punto de interés con SPACE
+        if (input.isKeyDown(GLFW_KEY_SPACE) && camera.getCameraMode() == CameraMode::INTEREST_POINT)
+            camera.nextInterestPoint();
 
-			break;
-		case CameraMode::AERIAL:
-			camera.updateAerialCamera(input, deltaTime);
-			break;
-		case CameraMode::INTEREST_POINT:
-			camera.updateInterestPointCamera(deltaTime);
-			break;
-		}
+        // Actualizar cámara según el modo actual
+        glm::vec3 rubyPos = rubyObj->transform.getPosition();
 
-		// Controles de Ruby 
-		// Se mueve en la dirección hacia donde apunta la cámara
-		float rubyMoveSpeed = 8.0f;
-		glm::vec3 cameraDirection = camera.getDirection();
+        // Destino de tercera persona (usado como target en transiciones hacia/desde ese modo)
+        glm::vec3 camDir3P = camera.getDirection();
+        glm::vec3 thirdCamPos = rubyPos - glm::normalize(glm::vec3(camDir3P.x, 0.0f, camDir3P.z)) * 2.5f;
+        thirdCamPos.y = rubyPos.y + 1.0f;
+        glm::vec3 thirdLookAt = rubyPos + glm::vec3(0.0f, 1.0f, 0.0f);
 
-		// Proyectar la dirección de la cámara al plano XZ (ignorar Y)
-		glm::vec3 moveDirection = glm::normalize(glm::vec3(cameraDirection.x, 0.0f, cameraDirection.z));
+        // Destino aéreo: posición sobre el centro del mapa a aerialHeight
+        glm::vec3 aerialTarget(0.0f, 15.0f, 0.0f);
+        glm::vec3 aerialLookAt(0.0f, 0.0f, 0.0f);
 
-		// Calcular dirección perpendicular (izquierda/derecha)
-		glm::vec3 rightDirection = glm::normalize(glm::cross(moveDirection, glm::vec3(0.0f, 1.0f, 0.0f)));
+        switch (camera.getCameraMode())
+        {
+        case CameraMode::THIRD_PERSON:
+            // Durante transición hacia tercera persona, proveer el destino
+            if (camera.isInModeTransition())
+            {
+                camera.setTransitionTarget(thirdCamPos, thirdLookAt);
+                camera.updateInterestPointCamera(deltaTime);
+                break;
+            }
+            // Control normal
+            if (input.isKeyDown(GLFW_KEY_Q))
+                camera.rotateOrbit(90.0f * deltaTime);
+            if (input.isKeyDown(GLFW_KEY_E))
+                camera.rotateOrbit(-90.0f * deltaTime);
+            camera.mouseControl(input.getMouseDeltaX() * 0.5f, input.getMouseDeltaY() * 0.5f);
+            camera.updateThirdPersonCamera(rubyPos, deltaTime);
+            break;
 
-		if (input.isKeyDown(GLFW_KEY_W))
-		{
-			glm::vec3 movement = moveDirection * rubyMoveSpeed * deltaTime;
-			rubyObj->transform.translate(movement.x, 0.0f, movement.z);
-		}
+        case CameraMode::AERIAL:
+            // Durante transición hacia aéreo, proveer el destino
+            if (camera.isInModeTransition())
+            {
+                camera.setTransitionTarget(aerialTarget, aerialLookAt);
+                camera.updateInterestPointCamera(deltaTime);
+                break;
+            }
+            // Control normal
+            camera.updateAerialCamera(input, deltaTime);
+            break;
 
-		if (input.isKeyDown(GLFW_KEY_S))
-		{
-			glm::vec3 movement = moveDirection * rubyMoveSpeed * deltaTime;
-			rubyObj->transform.translate(-movement.x, 0.0f, -movement.z);
-		}
+        case CameraMode::INTEREST_POINT:
+        {
+            // Proveer destino de salida hacia tercera persona
+            camera.setTransitionTarget(thirdCamPos, thirdLookAt);
+            camera.updateInterestPointCamera(deltaTime);
+            break;
+        }
+        }
 
-		if (input.isKeyDown(GLFW_KEY_A))
-		{
-			glm::vec3 movement = rightDirection * rubyMoveSpeed * deltaTime;
-			rubyObj->transform.translate(-movement.x, 0.0f, -movement.z);
-		}
+        // Movimiento del tren
+        train.Update(trainSpeed, deltaTime, wheelRotationSpeed);
 
-		if (input.isKeyDown(GLFW_KEY_D))
-		{
-			glm::vec3 movement = rightDirection * rubyMoveSpeed * deltaTime;
-			rubyObj->transform.translate(movement.x, 0.0f, movement.z);
-		}
+        // Movimiento de Ruby — solo en modo THIRD_PERSON y sin transición activa
+        float rubyMoveSpeed = 8.0f;
+        glm::vec3 cameraDirection = camera.getDirection();
+        glm::vec3 moveDirection = glm::normalize(glm::vec3(cameraDirection.x, 0.0f, cameraDirection.z));
+        glm::vec3 rightDirection = glm::normalize(glm::cross(moveDirection, glm::vec3(0.0f, 1.0f, 0.0f)));
 
-		// Hacer girar a Ruby hacia donde está mirando la cámara
-		glm::vec3 rubyDirection = glm::normalize(glm::vec3(cameraDirection.x, 0.0f, cameraDirection.z));
-		float angleY = atan2(rubyDirection.x, rubyDirection.z);
-		rubyObj->transform.setRotation(0.0f, glm::degrees(angleY), 0.0f);
+        bool isWalking = false;
 
-		// Tecla Z para mover la nave hacia adelante
-		if (input.isKeyDown(GLFW_KEY_Z))
-			naveObj->transform.translate(-naveSpeed * deltaTime, 0.0f, 0.0f);
+        if (camera.getCameraMode() == CameraMode::THIRD_PERSON && !camera.isInModeTransition())
+        {
+            if (input.isKeyDown(GLFW_KEY_W))
+            {
+                glm::vec3 movement = moveDirection * rubyMoveSpeed * deltaTime;
+                rubyObj->transform.translate(movement.x, 0.0f, movement.z);
+                isWalking = true;
+            }
+            if (input.isKeyDown(GLFW_KEY_S))
+            {
+                glm::vec3 movement = moveDirection * rubyMoveSpeed * deltaTime;
+                rubyObj->transform.translate(-movement.x, 0.0f, -movement.z);
+                isWalking = true;
+            }
+            if (input.isKeyDown(GLFW_KEY_A))
+            {
+                glm::vec3 movement = rightDirection * rubyMoveSpeed * deltaTime;
+                rubyObj->transform.translate(-movement.x, 0.0f, -movement.z);
+                isWalking = true;
+            }
+            if (input.isKeyDown(GLFW_KEY_D))
+            {
+                glm::vec3 movement = rightDirection * rubyMoveSpeed * deltaTime;
+                rubyObj->transform.translate(movement.x, 0.0f, movement.z);
+                isWalking = true;
+            }
+        }
 
-		// Tecla X para mover la nave hacia atrás
-		if (input.isKeyDown(GLFW_KEY_X))
-			naveObj->transform.translate(naveSpeed * deltaTime, 0.0f, 0.0f);
+        // Animación de caminata de Ruby
+        if (isWalking)
+        {
+            walkTime += deltaTime * walkSpeed;
+            angleThigh = walkAmplitude * sin(walkTime);
+        }
+        else
+        {
+            walkTime = 0.0f;
+            angleThigh += (0.0f - angleThigh) * 8.0f * deltaTime;
+        }
 
-		// Movimiento del tren
-		train.Update(trainSpeed, deltaTime, wheelRotationSpeed);
+        leftArm->transform.setRotation(angleThigh, 0.0f, -65.0f);
+        rightArm->transform.setRotation(-angleThigh, 0.0f, 65.0f);
+        leftLeg->transform.setRotation(-angleThigh, 0.0f, 0.0f);
+        rightLeg->transform.setRotation(angleThigh, 0.0f, 0.0f);
+        cape->transform.setRotation((-angleThigh * 0.5f) + 45.0f, 0.0f, 0.0f);
 
-		// Ajustar intensidad de luces según ciclo día-noche
-		float timeProgress = skybox.getTimeProgress();
-		float dayIntensity, nightIntensity;
+        // Orientar a Ruby hacia donde mira la cámara — solo en modo THIRD_PERSON sin transición
+        if (camera.getCameraMode() == CameraMode::THIRD_PERSON && !camera.isInModeTransition())
+        {
+            glm::vec3 rubyDirection = glm::normalize(glm::vec3(cameraDirection.x, 0.0f, cameraDirection.z));
+            float angleY = atan2(rubyDirection.x, rubyDirection.z);
+            rubyObj->transform.setRotation(0.0f, glm::degrees(angleY), 0.0f);
+        }
 
-		if (timeProgress < 0.5f)
-		{
-			// Transición: día -> noche
-			float t = timeProgress * 2.0f; // 0 a 1
-			dayIntensity = 1.0f - t;       // 1 -> 0
-			nightIntensity = t;            // 0 -> 1
-		}
-		else
-		{
-			// Transición: noche -> día
-			float t = (timeProgress - 0.5f) * 2.0f; // 0 a 1
-			dayIntensity = t;              // 0 -> 1
-			nightIntensity = 1.0f - t;     // 1 -> 0
-		}
+        // Luces
 
-		// Ajustar luz direccional (luz del sol/luna)
-		glm::vec3 dayColor(1.0f, 0.95f, 0.8f);
-		glm::vec3 nightColor(0.4f, 0.4f, 0.6f);
-		glm::vec3 currentColor = glm::mix(nightColor, dayColor, dayIntensity);
+        // Luz direccional
+        float timeProgress = skybox.getTimeProgress();
+        float dayIntensity, nightIntensity;
 
-		directionalLight.setColor(currentColor);
-		directionalLight.setAmbientIntensity(0.3f * (0.5f + dayIntensity * 0.5f));
-		directionalLight.setDiffuseIntensity(0.8f * dayIntensity);
+        if (timeProgress < 0.5f)
+        {
+            // Primera mitad del ciclo: día -> noche
+            float t = timeProgress * 2.0f;
+            dayIntensity = 1.0f - t;
+            nightIntensity = t;
+        }
+        else
+        {
+            // Segunda mitad del ciclo: noche -> día
+            float t = (timeProgress - 0.5f) * 2.0f;
+            dayIntensity = t;
+            nightIntensity = 1.0f - t;
+        }
 
-		// Actualizar linterna con posición y dirección de la cámara
-		spotLights[0].setFlash(camera.getPosition(), camera.getDirection());
+        glm::vec3 dayColor(1.0f, 0.95f, 0.8f);   // amarillo cálido
+        glm::vec3 nightColor(0.4f, 0.4f, 0.6f);  // azul oscuro
+        glm::vec3 currentColor = glm::mix(nightColor, dayColor, dayIntensity);
 
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        directionalLight.setColor(currentColor);
+        directionalLight.setAmbientIntensity(0.3f * (0.5f + dayIntensity * 0.5f));
+        directionalLight.setDiffuseIntensity(0.8f * dayIntensity);
 
-		// Skybox
-		skybox.draw(camera.calculateViewMatrix(), projection);
+        // Renderizado
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		// Activar shader principal
-		shader.use();
+        // Skybox
+        skybox.draw(camera.calculateViewMatrix(), projection);
 
-		glm::mat4 view = camera.calculateViewMatrix();
-		glUniformMatrix4fv(shader.getProjectionLocation(), 1, GL_FALSE, glm::value_ptr(projection));
-		glUniformMatrix4fv(shader.getViewLocation(), 1, GL_FALSE, glm::value_ptr(view));
-		glm::vec3 eye = camera.getPosition();
-		glUniform3f(shader.getEyePositionLocation(), eye.x, eye.y, eye.z);
-		glUniform3f(shader.getColorLocation(), 1.0f, 1.0f, 1.0f);
-		glUniform2f(shader.getTextureOffsetLocation(), 0.0f, 0.0f);
+        // Configurar shader principal
+        shader.use();
 
-		// Enviar luces
-		shader.setDirectionalLight(&directionalLight);
-		shader.setSpotLights(spotLights, spotLightCount);
+        glm::mat4 view = camera.calculateViewMatrix();
+        glUniformMatrix4fv(shader.getProjectionLocation(), 1, GL_FALSE, glm::value_ptr(projection));
+        glUniformMatrix4fv(shader.getViewLocation(), 1, GL_FALSE, glm::value_ptr(view));
+        glm::vec3 eye = camera.getPosition();
+        glUniform3f(shader.getEyePositionLocation(), eye.x, eye.y, eye.z);
+        glUniform3f(shader.getColorLocation(), 1.0f, 1.0f, 1.0f);
+        glUniform2f(shader.getTextureOffsetLocation(), 0.0f, 0.0f);
+
+        shader.setDirectionalLight(&directionalLight);
 
 		// Renderizar objetos
 		floorObj->draw(shader);
 
-		//naveObj->draw(shader);
+		
+        // Objetos de la escena
+        floorObj->draw(shader);
+        
+        // Render del castillo
+        castle.GetCastleObject()->draw(shader);
 
-		// Ruby con alpha blend
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		rubyObj->draw(shader);
-		glDisable(GL_BLEND);
+        // Render del tren
+        train.GetTrainObject()->draw(shader);
 
-		// Render del castillo y del tren (usando los getters de tus clases)
-		castle.GetCastleObject()->draw(shader);
-		train.GetTrainObject()->draw(shader);
+        // Ruby
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        rubyObj->draw(shader);
+        glDisable(GL_BLEND);
 
-		glUseProgram(0);
-		mainWindow.swapBuffers();
-	}
-	audioManager.shutdown();
-	return 0;
+        glUseProgram(0);
+        mainWindow.swapBuffers();
+    }
+
+    audioManager.shutdown();
+    return 0;
 }

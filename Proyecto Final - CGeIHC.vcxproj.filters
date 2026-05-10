@@ -63,10 +63,13 @@
     <ClCompile Include="GameObject.cpp">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
-    <ClCompile Include="Train.cpp">
+    <ClCompile Include="Castle.cpp">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
-    <ClCompile Include="Castle.cpp">
+    <ClCompile Include="Train.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClCompile>
+    <ClCompile Include="Train.cpp">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
   </ItemGroup>
@@ -131,9 +134,6 @@
     <ClInclude Include="GameObject.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
-    <ClInclude Include="Train.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
     <ClInclude Include="Castle.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
@@ -151,5 +151,11 @@
     <None Include="shaders\skybox.vert">
       <Filter>Archivos de recursos</Filter>
     </None>
+    <None Include=".github\copilot-instructions.md" />
+    <None Include="REPORTE_IMPLEMENTACION_MODOS_CAMARA.md" />
+    <None Include="GUIA_RAPIDA_CAMARA.md" />
+    <None Include="DOCUMENTACION_TECNICA_CAMBIOS.md" />
+    <None Include="RESUMEN_EJECUTIVO.md" />
+    <None Include="FIX_TECLAS_CAMBIO_MODO.md" />
   </ItemGroup>
 </Project>

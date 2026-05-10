@@ -149,6 +149,7 @@
     <ClCompile Include="SpotLight.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Train.cpp" />
+    <ClCompile Include="Train.h" />
     <ClCompile Include="Transform.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
@@ -172,12 +173,16 @@
     <ClInclude Include="SpotLight.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="Texture.h" />
-    <ClInclude Include="Train.h" />
     <ClInclude Include="Transform.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".github\copilot-instructions.md" />
+    <None Include="DOCUMENTACION_TECNICA_CAMBIOS.md" />
+    <None Include="FIX_TECLAS_CAMBIO_MODO.md" />
+    <None Include="GUIA_RAPIDA_CAMARA.md" />
+    <None Include="REPORTE_IMPLEMENTACION_MODOS_CAMARA.md" />
+    <None Include="RESUMEN_EJECUTIVO.md" />
     <None Include="shaders\shader.frag" />
     <None Include="shaders\shader.vert" />
     <None Include="shaders\skybox.frag" />

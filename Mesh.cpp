@@ -32,7 +32,6 @@ void Mesh::create(GLfloat* vertices, GLuint* indices, GLuint vertexCount, GLuint
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
-
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 

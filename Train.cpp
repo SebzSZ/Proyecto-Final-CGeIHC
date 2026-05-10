@@ -17,7 +17,7 @@ bool Train::Initialize(Material& matOpaco)
 	trainObj = std::make_shared<GameObject>("Train Container", GameObjectType::MODEL);
 
 	engineCar = std::make_shared<GameObject>("Big Car", GameObjectType::MODEL);
-	engineCar->setModel(&bigCarModel); 
+	engineCar->setModel(&bigCarModel);
 	engineCar->setMaterial(&matOpaco);
 	engineCar->transform.setPosition(0.0f, 1.25f, 0.0f);
 	engineCar->transform.setScale(1.0f);
@@ -62,7 +62,7 @@ bool Train::Initialize(Material& matOpaco)
 		CreateWagon(i, matOpaco);
 	}
 
-	return true; 
+	return true;
 }
 
 void Train::CreateWagon(int i, Material& matOpaco)
