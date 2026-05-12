@@ -61,34 +61,34 @@ std::shared_ptr<GameObject> CreateAvatar(
     std::shared_ptr<GameObject>& cape)
 {
     // Cuerpo raíz
-    std::shared_ptr<GameObject> rubyObj = std::make_shared<GameObject>("Ruby", GameObjectType::MODEL);
+    std::shared_ptr<GameObject> rubyObj = std::make_shared<GameObject>("Ruby");
     rubyObj->setModel(&rubyModel);
     rubyObj->setMaterial(&matOpaco);
     rubyObj->transform.setPosition(20.0f, 1.2f, 1.64f);
     rubyObj->transform.setScale(5.0f);
 
     // Extremidades — hijos de rubyObj
-    leftArm = std::make_shared<GameObject>("LeftArm", GameObjectType::MODEL);
+    leftArm = std::make_shared<GameObject>("LeftArm");
     leftArm->setModel(&rubyLeftArm);
     leftArm->transform.setPosition(0.025f, 0.0611f, 0.0f);
     leftArm->transform.setRotation(0.0f, 0.0f, -65.0f);
     rubyObj->addChild(leftArm);
 
-    rightArm = std::make_shared<GameObject>("RightArm", GameObjectType::MODEL);
+    rightArm = std::make_shared<GameObject>("RightArm");
     rightArm->setModel(&rubyRightArm);
     rightArm->transform.setPosition(-0.025f, 0.0611f, 0.0f);
     rightArm->transform.setRotation(0.0f, 0.0f, 65.0f);
     rubyObj->addChild(rightArm);
 
-    leftLeg = std::make_shared<GameObject>("LeftLeg", GameObjectType::MODEL);
+    leftLeg = std::make_shared<GameObject>("LeftLeg");
     leftLeg->setModel(&rubyLeftLeg);
     rubyObj->addChild(leftLeg);
 
-    rightLeg = std::make_shared<GameObject>("RightLeg", GameObjectType::MODEL);
+    rightLeg = std::make_shared<GameObject>("RightLeg");
     rightLeg->setModel(&rubyRightLeg);
     rubyObj->addChild(rightLeg);
 
-    cape = std::make_shared<GameObject>("Cape", GameObjectType::MODEL);
+    cape = std::make_shared<GameObject>("Cape");
     cape->setModel(&rubyCape);
     cape->transform.setPosition(0.0f, 0.065f, -0.01f);
     rubyObj->addChild(cape);
@@ -174,11 +174,10 @@ int main()
     // GameObjects de la escena
 
     // Piso de la escena
-    std::shared_ptr<GameObject> floorObj = std::make_shared<GameObject>("Floor", GameObjectType::MESH);
-    MeshData floorData;
-    floorData.vertices = std::vector<GLfloat>(std::begin(FLOOR_VERTS), std::end(FLOOR_VERTS));
-    floorData.indices = std::vector<GLuint>(std::begin(FLOOR_IDX), std::end(FLOOR_IDX));
-    floorObj->loadMesh(floorData);
+    std::shared_ptr<GameObject> floorObj = std::make_shared<GameObject>("Floor");
+    Mesh* floorMesh = new Mesh();
+    floorMesh->create(FLOOR_VERTS, FLOOR_IDX, sizeof(FLOOR_VERTS) / sizeof(GLfloat), sizeof(FLOOR_IDX) / sizeof(GLuint));
+    floorObj->setMesh(floorMesh);
     floorObj->setTextureID(floorTexture.getID());
     floorObj->setMaterial(&matOpaco);
     floorObj->transform.setScale(50.0f, 1.0f, 50.0f);

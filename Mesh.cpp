@@ -30,9 +30,9 @@ void Mesh::create(GLfloat* vertices, GLuint* indices, GLuint vertexCount, GLuint
 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride, (void*)(5 * sizeof(GLfloat)));
 	glEnableVertexAttribArray(2);
 
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void Mesh::calcAverageNormals(GLuint* indices, GLuint indexCount, GLfloat* vertices, GLuint vertexCount, GLuint vLength, GLuint normalOffset)

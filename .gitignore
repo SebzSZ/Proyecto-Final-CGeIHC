@@ -22,7 +22,7 @@ glfw3.dll
 stb_image.h
 dr_mp3.h
 dr_wav.h
-OpenAL.dll
+OpenAL32.dll
 
 # Modelos y texturas
 Models/

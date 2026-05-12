@@ -1,14 +1,17 @@
-#define DR_WAV_IMPLEMENTATION
 #define DR_MP3_IMPLEMENTATION
+#define DR_WAV_IMPLEMENTATION
+
+#include <cstdio>
+
 #include "dr_wav.h"
 #include "dr_mp3.h"
 
-#include <cstdio>
 #include "AudioManager.h"
 
+// Inicialización
 bool AudioManager::Initialize()
 {
-    // Abrir el dispositivo de audio predeterminado del sistema.
+    // Abrir el dispositivo de audio predeterminado del sistema
     device = alcOpenDevice(nullptr);
     if (!device)
     {
@@ -16,7 +19,7 @@ bool AudioManager::Initialize()
         return false;
     }
 
-    // Crear el contexto de OpenAL (equivalente al contexto de OpenGL).
+    // Crear el contexto de OpenAL
     context = alcCreateContext(device, nullptr);
     if (!context)
     {
@@ -37,35 +40,7 @@ bool AudioManager::Initialize()
     return true;
 }
 
-void AudioManager::shutdown()
-{
-    // Liberar todas las sources y buffers en GPU de audio
-    for (auto& [name, clip] : clips)
-    {
-        if (clip.source)
-        {
-            alSourceStop(clip.source);
-            alDeleteSources(1, &clip.source);
-        }
-        if (clip.buffer)
-            alDeleteBuffers(1, &clip.buffer);
-    }
-    clips.clear();
-
-    // Destruir contexto y cerrar dispositivo
-    if (context)
-    {
-        alcMakeContextCurrent(nullptr);
-        alcDestroyContext(context);
-        context = nullptr;
-    }
-    if (device)
-    {
-        alcCloseDevice(device);
-        device = nullptr;
-    }
-}
-
+// Carga de sonidos
 bool AudioManager::loadWAV(const std::string& name, const std::string& filePath)
 {
     if (clips.count(name))
@@ -137,8 +112,7 @@ bool AudioManager::loadMP3(const std::string& name, const std::string& filePath)
     return true;
 }
 
-//Reproduccion
-
+// Reproducción y control
 void AudioManager::play(const std::string& name, bool loop, float gain)
 {
     auto it = clips.find(name);
@@ -198,6 +172,7 @@ bool AudioManager::isPlaying(const std::string& name) const
     return state == AL_PLAYING;
 }
 
+// Audio 3D
 void AudioManager::setSourcePosition(const std::string& name, const glm::vec3& pos)
 {
     auto it = clips.find(name);
@@ -218,6 +193,7 @@ void AudioManager::setListenerPosition(const glm::vec3& position,
     alListenerfv(AL_ORIENTATION, orientation);
 }
 
+// Métodos auxiliares
 ALuint AudioManager::createSource(ALuint buffer, bool loop, float gain)
 {
     ALuint source;
@@ -229,7 +205,7 @@ ALuint AudioManager::createSource(ALuint buffer, bool loop, float gain)
     alSourcef(source, AL_GAIN, gain);
     alSourcef(source, AL_PITCH, 1.0f);
 
-    // Posicion inicial en el origen; se actualiza con setSourcePosition()
+    // Posicion inicial en el origen, se actualiza con setSourcePosition()
     alSource3f(source, AL_POSITION, 0.0f, 0.0f, 0.0f);
     alSource3f(source, AL_VELOCITY, 0.0f, 0.0f, 0.0f);
 
@@ -242,6 +218,36 @@ void AudioManager::checkError(const std::string& where) const
     ALenum error = alGetError();
     if (error != AL_NO_ERROR)
         printf("[Audio] Error en '%s': 0x%X\n", where.c_str(), error);
+}
+
+// Limpieza
+void AudioManager::shutdown()
+{
+    // Liberar todas las sources y buffers en GPU de audio
+    for (auto& [name, clip] : clips)
+    {
+        if (clip.source)
+        {
+            alSourceStop(clip.source);
+            alDeleteSources(1, &clip.source);
+        }
+        if (clip.buffer)
+            alDeleteBuffers(1, &clip.buffer);
+    }
+    clips.clear();
+
+    // Destruir contexto y cerrar dispositivo
+    if (context)
+    {
+        alcMakeContextCurrent(nullptr);
+        alcDestroyContext(context);
+        context = nullptr;
+    }
+    if (device)
+    {
+        alcCloseDevice(device);
+        device = nullptr;
+    }
 }
 
 AudioManager::~AudioManager()
