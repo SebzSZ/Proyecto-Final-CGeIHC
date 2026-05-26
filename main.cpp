@@ -27,6 +27,8 @@
 #include "GameObject.h"
 #include "Train.h"
 #include "Castle.h"
+#include "Malon.h"
+#include "Malon.h"
 
 // --- INTEGRACION NAVE ---
 #include "Nave.h"
@@ -185,6 +187,9 @@ int main()
     dekuTreeObj->transform.setPosition(-17.52f, 0.0f, 7.62f);
     dekuTreeObj->transform.setRotation(0.0f, 35.6f, 0.0f);
     dekuTreeObj->transform.setScale(0.01f);
+    
+    Malon malon;
+	if (!malon.Initialize(matOpaco)) return -1;
 
     Castle castle;
     if (!castle.Initialize(matOpaco)) return -1;
@@ -195,12 +200,11 @@ int main()
     float trainSpeed = 5.0f;
     float wheelRotationSpeed = 200.0f;
 
-    // --- INTEGRACION NAVE ---
+    // Nave Keyframes
     Nave nave;
     if (!nave.Initialize(matOpaco)) return -1;
     nave.SetKeyframesIniciales();
     nave.DisplayMenu();
-    // ------------------------
 
     // Avatar: Ruby
 
@@ -349,12 +353,9 @@ int main()
         }
         }
 
-        // Movimiento del tren
         train.Update(trainSpeed, deltaTime, wheelRotationSpeed);
-
-        // --- INTEGRACION NAVE ---
+        malon.Update(deltaTime);
         nave.Update(deltaTime);
-        // ------------------------
 
         // Movimiento de Ruby — solo en modo THIRD_PERSON y sin transición activa
         float rubyMoveSpeed = 8.0f;
@@ -481,6 +482,9 @@ int main()
 
 		// Render del Deku Tree
 		dekuTreeObj->draw(shader);
+
+		// Render de Malon
+		malon.GetMalonObject()->draw(shader);
 
         // Ruby
         glEnable(GL_BLEND);
