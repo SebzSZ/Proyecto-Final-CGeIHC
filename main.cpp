@@ -166,13 +166,6 @@ int main()
     Model rubyRightLeg; if (!rubyRightLeg.load("Models/RubyPiernaDer.obj")) return -1;
     Model rubyCape;     if (!rubyCape.load("Models/RubyCapa.obj"))         return -1;
 
-    // Castillo de Hyrule — partes del escenario
-    Model mainRoom;  if (!mainRoom.load("Models/HyruleCastle_MainRoom.obj")) return -1;
-    Model bigTower;  if (!bigTower.load("Models/HyruleCastle_BigTower.obj")) return -1;
-    Model wall;      if (!wall.load("Models/HyruleCastle_Wall.obj"))         return -1;
-    Model midTower;  if (!midTower.load("Models/HyruleCastle_MidTower.obj")) return -1;
-    Model floor;     if (!floor.load("Models/HyruleCastle_Floor.obj"))       return -1;
-
     // GameObjects de la escena
 
     // Piso de la escena
@@ -184,6 +177,14 @@ int main()
     floorObj->setTextureID(floorTexture.getID());
     floorObj->setMaterial(&matOpaco);
     floorObj->transform.setScale(50.0f, 1.0f, 50.0f);
+
+	Model dekuTreeModel; if (!dekuTreeModel.load("Models/DekuTree.obj")) return -1;
+	std::shared_ptr<GameObject> dekuTreeObj = std::make_shared<GameObject>("DekuTree", GameObjectType::MODEL);
+    dekuTreeObj->setModel(&dekuTreeModel);
+	dekuTreeObj->setMaterial(&matOpaco);
+    dekuTreeObj->transform.setPosition(-17.52f, 0.0f, 7.62f);
+    dekuTreeObj->transform.setRotation(0.0f, 35.6f, 0.0f);
+    dekuTreeObj->transform.setScale(0.01f);
 
     Castle castle;
     if (!castle.Initialize(matOpaco)) return -1;
@@ -475,10 +476,11 @@ int main()
         // Render del tren
         train.GetTrainObject()->draw(shader);
 
-        // --- INTEGRACION NAVE ---
-        // Render de la nave usando el location del modelo del nuevo shader
+        // Nave
 		nave.GetNaveObject()->draw(shader);
-        // ------------------------
+
+		// Render del Deku Tree
+		dekuTreeObj->draw(shader);
 
         // Ruby
         glEnable(GL_BLEND);
