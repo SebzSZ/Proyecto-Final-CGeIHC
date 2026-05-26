@@ -19,6 +19,7 @@
 #include "Material.h"
 #include "Mesh.h"
 #include "Model.h"
+#include "PointLight.h"
 #include "Shader.h"
 #include "Skybox.h"
 #include "SpotLight.h"
@@ -45,6 +46,10 @@ static GLfloat FLOOR_VERTS[] = {
        -1.0f,  0.0f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f, 0.0f,
 };
 static GLuint FLOOR_IDX[] = { 0, 1, 2,  0, 2, 3 };
+
+// Luces
+unsigned int pointLightCount = 0;
+PointLight pointLights[MAX_POINT_LIGHTS];
 
 // CreateAvatar
 // Construir la jerarquía del avatar (Ruby)
@@ -96,6 +101,78 @@ std::shared_ptr<GameObject> CreateAvatar(
     rubyObj->addChild(cape);
 
     return rubyObj;
+}
+
+void CreateTorchPointLights()
+{
+    // Antorcha 1
+    pointLights[0] = PointLight(1.0f, 0.5f, 0.0f, // Color naranja (fuego)
+        0.2f, 1.0f,
+        6.38f, 4.0f, 0.03f, // Posición (un poco más arriba del modelo)
+        1.0f, 0.7f, 1.8f);
+    pointLightCount++;
+
+    // Antorcha 2
+    pointLights[1] = PointLight(1.0f, 0.5f, 0.0f, // Color naranja (fuego)
+        0.2f, 1.0f,
+        32.9f, 4.0f, 0.03f, // Posición
+        1.0f, 0.7f, 1.8f);
+    pointLightCount++;
+
+    // Antorcha 3
+    pointLights[2] = PointLight(1.0f, 0.5f, 0.0f, // Color naranja (fuego)
+        0.2f, 1.0f,
+        24.0f, 3.0f, 5.57f, // Posición
+        1.0f, 0.7f, 1.8f);
+    pointLightCount++;
+
+    // Antorcha 4
+    pointLights[3] = PointLight(1.0f, 0.5f, 0.0f, // Color naranja (fuego)
+        0.2f, 1.0f,
+        16.06f, 3.0f, 5.57f, // Posición
+        1.0f, 0.7f, 1.8f);  
+    pointLightCount++;
+}
+
+std::shared_ptr<GameObject> CreateTorches(Model& torchModel, Material& matOpaco)
+{
+    std::shared_ptr<GameObject> container = std::make_shared<GameObject>("Torches", GameObjectType::MODEL);
+
+    std::shared_ptr<GameObject> torchObj1 = std::make_shared<GameObject>("Torch", GameObjectType::MODEL);
+    torchObj1->setModel(&torchModel);
+    torchObj1->setMaterial(&matOpaco);
+    torchObj1->transform.setPosition(6.38f, 2.85f, 0.03f);
+    torchObj1->transform.setRotation(0.0f, 90.0f, 0.0f);
+    torchObj1->transform.setScale(0.5f);
+    container->addChild(torchObj1);
+
+    std::shared_ptr<GameObject> torchObj2 = std::make_shared<GameObject>("Torch", GameObjectType::MODEL);
+    torchObj2->setModel(&torchModel);
+    torchObj2->setMaterial(&matOpaco);
+    torchObj2->transform.setPosition(32.9f, 2.85f, 0.03f);
+    torchObj2->transform.setRotation(0.0f, 90.0f, 0.0f);
+    torchObj2->transform.setScale(0.5f);
+    container->addChild(torchObj2);
+
+    std::shared_ptr<GameObject> torchObj3 = std::make_shared<GameObject>("Torch", GameObjectType::MODEL);
+    torchObj3->setModel(&torchModel);
+    torchObj3->setMaterial(&matOpaco);
+    torchObj3->transform.setPosition(24.0f, 1.85f, 5.57f);
+    torchObj3->transform.setRotation(0.0f, 135.0f, 0.0f);
+    torchObj3->transform.setScale(0.5f);
+    container->addChild(torchObj3);
+
+    std::shared_ptr<GameObject> torchObj4 = std::make_shared<GameObject>("Torch", GameObjectType::MODEL);
+    torchObj4->setModel(&torchModel);
+    torchObj4->setMaterial(&matOpaco);
+    torchObj4->transform.setPosition(16.06f, 1.85f, 5.57f);
+    torchObj4->transform.setRotation(0.0f, 47.21f, 0.0f);
+    torchObj4->transform.setScale(0.5f);
+    container->addChild(torchObj4);
+
+    CreateTorchPointLights();
+
+    return container;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -184,6 +261,9 @@ int main()
     dekuTreeObj->transform.setRotation(0.0f, 35.6f, 0.0f);
 	dekuTreeObj->transform.setScale(0.01f);
 
+	Model torchModel; if (!torchModel.load("Models/Torch.obj")) return -1;
+	std::shared_ptr<GameObject> torches = CreateTorches(torchModel, matOpaco);
+
 	Malon malon;
 	if (!malon.Initialize(matOpaco, matBrillante)) return -1;
 
@@ -260,6 +340,9 @@ int main()
     glm::mat4 model(1.0f);
     GLfloat lastTime = (GLfloat)glfwGetTime();
 
+	// Estado de las antorchas
+    bool torchesOn = true;
+
     // Bucle principal
     while (!mainWindow.shouldClose())
     {
@@ -275,6 +358,21 @@ int main()
         InputManager& input = InputManager::getInstance();
         input.beginFrame();
         glfwPollEvents();
+
+        // Toggle para apagar o encender las luces del castillo
+        if (input.isKeyPressed(GLFW_KEY_T))
+        {
+            torchesOn = !torchesOn; 
+
+            GLfloat targetAmbient = torchesOn ? 0.2f : 0.0f;
+            GLfloat targetDiffuse = torchesOn ? 1.0f : 0.0f;
+
+            for (unsigned int i = 0; i < pointLightCount; i++)
+            {
+                pointLights[i].setAmbientIntensity(targetAmbient);
+                pointLights[i].setDiffuseIntensity(targetDiffuse);
+            }
+        }
 
         // Cambio de modo de cámara (C, V, B)
         if (input.isKeyDown(GLFW_KEY_C))
@@ -463,24 +561,28 @@ int main()
         glUniform2f(shader.getTextureOffsetLocation(), 0.0f, 0.0f);
 
         shader.setDirectionalLight(&directionalLight);
+        shader.setPointLights(pointLights, pointLightCount);
 
-        // Objetos de la escena
+        // Piso
         floorObj->draw(shader);
 
-        // Render del castillo
+        // Hyrule Castle
         castle.GetCastleObject()->draw(shader);
 
-        // Render del tren
+        // Tren
         train.GetTrainObject()->draw(shader);
 
         // Nave
 		nave.GetNaveObject()->draw(shader);
 
-		// Render del Deku Tree
+		// Deku Tree
 		dekuTreeObj->draw(shader);
 
-		// Render de Malon y Nimbus 2000
+		// Malon y Nimbus 2000
 		malon.GetMalonObject()->draw(shader);
+
+        // Antorchas del Hyrule Castle
+        torches->draw(shader);
 
 		// Ruby
         glEnable(GL_BLEND);
