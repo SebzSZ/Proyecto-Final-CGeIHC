@@ -27,7 +27,9 @@ void Model::processNode(aiNode* node, const aiScene* scene, const std::string& m
 	for (unsigned int i = 0; i < node->mNumMeshes; i++)
 	{
 		aiMesh* aiMeshPtr = scene->mMeshes[node->mMeshes[i]];
-		meshes.push_back(processMesh(aiMeshPtr, scene, modelDir));
+		Mesh* mesh = processMesh(aiMeshPtr, scene, modelDir);
+		if (mesh)
+			meshes.push_back(mesh);
 	}
 
 	for (unsigned int i = 0; i < node->mNumChildren; i++)
@@ -38,6 +40,9 @@ void Model::processNode(aiNode* node, const aiScene* scene, const std::string& m
 
 Mesh* Model::processMesh(aiMesh* aiMeshPtr, const aiScene* scene, const std::string& modelDir)
 {
+	if (!aiMeshPtr || aiMeshPtr->mNumVertices == 0 || aiMeshPtr->mNumFaces == 0)
+		return nullptr;
+
 	std::vector<GLfloat> vertices;
 	std::vector<GLuint> indices;
 
@@ -83,6 +88,9 @@ Mesh* Model::processMesh(aiMesh* aiMeshPtr, const aiScene* scene, const std::str
 			indices.push_back(face.mIndices[j]);
 		}
 	}
+
+	if (vertices.empty() || indices.empty())
+		return nullptr;
 
 	Mesh* mesh = new Mesh();
 	mesh->create(vertices.data(), indices.data(), (GLuint)vertices.size(), (GLuint)indices.size());
@@ -131,6 +139,9 @@ void Model::render() const
 {
 	for (size_t i = 0; i < meshes.size(); i++)
 	{
+		if (!meshes[i])
+			continue;
+
 		if (i < textures.size() && textures[i])
 		{
 			textures[i]->bind();

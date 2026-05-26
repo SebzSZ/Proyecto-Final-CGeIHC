@@ -28,11 +28,7 @@
 #include "Train.h"
 #include "Castle.h"
 #include "Malon.h"
-#include "Malon.h"
-
-// --- INTEGRACION NAVE ---
 #include "Nave.h"
-// ------------------------
 
 // Rutas de shaders
 static const char* VERT_SHADER = "shaders/shader.vert";
@@ -186,12 +182,12 @@ int main()
 	dekuTreeObj->setMaterial(&matOpaco);
     dekuTreeObj->transform.setPosition(-17.52f, 0.0f, 7.62f);
     dekuTreeObj->transform.setRotation(0.0f, 35.6f, 0.0f);
-    dekuTreeObj->transform.setScale(0.01f);
-    
-    Malon malon;
-	if (!malon.Initialize(matOpaco)) return -1;
+	dekuTreeObj->transform.setScale(0.01f);
 
-    Castle castle;
+	Malon malon;
+	if (!malon.Initialize(matOpaco, matBrillante)) return -1;
+
+	Castle castle;
     if (!castle.Initialize(matOpaco)) return -1;
 
     Train train;
@@ -483,10 +479,10 @@ int main()
 		// Render del Deku Tree
 		dekuTreeObj->draw(shader);
 
-		// Render de Malon
+		// Render de Malon y Nimbus 2000
 		malon.GetMalonObject()->draw(shader);
 
-        // Ruby
+		// Ruby
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         rubyObj->draw(shader);

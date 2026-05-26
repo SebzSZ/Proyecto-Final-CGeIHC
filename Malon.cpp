@@ -1,10 +1,10 @@
 #include "Malon.h"
 
-Malon::Malon() : currentKeyframeIndex(0), nextKeyframeIndex(1), transitionProgress(0.0f), transitionSpeed(1.5f)
+Malon::Malon() : currentKeyframeIndex(0), nextKeyframeIndex(1), transitionProgress(0.0f), transitionSpeed(1.5f), nimbusTime(0.0f)
 {
 }
 
-bool Malon::Initialize(Material& matOpaco)
+bool Malon::Initialize(Material& matOpaco, Material& matBrillante)
 {
 	if (!malonCuerpoModel.load("Models/Malon_Cuerpo.obj")) return false;
 	malonCuerpoObj = std::make_shared<GameObject>("Malon Cuerpo", GameObjectType::MODEL);
@@ -38,6 +38,16 @@ bool Malon::Initialize(Material& matOpaco)
 	malonManoIzquierdaObj->transform.setRotation(0.0f, 180.0f, 0.0f);
 	malonAntebrazoIzquierdoObj->addChild(malonManoIzquierdaObj);
 
+	if (!nimbus2000Model.load("Models/Nimbus2000.obj")) return false;
+	nimbus2000Obj = std::make_shared<GameObject>("Nimbus 2000", GameObjectType::MODEL);
+	nimbus2000Obj->setModel(&nimbus2000Model);
+	nimbus2000Obj->setMaterial(&matBrillante);
+
+	malonManoIzquierdaObj->addChild(nimbus2000Obj);
+	nimbus2000Obj->transform.setPosition(15.0f, -30.0f, 10.0f);
+	nimbus2000Obj->transform.setRotation(0.0f, 0.0f, -45.0f);
+	nimbus2000Obj->transform.setScale(50.0f);
+
 	SetupKeyframes();
 
 	return true;
@@ -52,17 +62,17 @@ void Malon::SetupKeyframes()
 
 	MalonKeyframe kf2;
 	kf2.rotBrazoIzquierdo = glm::vec3(0.0f, -125.0f, 20.0f);
-	kf2.rotAntebrazoIzquierdo = glm::vec3(0.0f, 180.0f, 0.0f);
+	kf2.rotAntebrazoIzquierdo = glm::vec3(0.0f, 180.0f, 10.0f);
 	kf2.rotManoIzquierda = glm::vec3(0.0f, 180.0f, 20.0f);
 
 	MalonKeyframe kf3;
 	kf3.rotBrazoIzquierdo = glm::vec3(0.0f, -130.0f, 0.0f);
-	kf3.rotAntebrazoIzquierdo = glm::vec3(0.0f, 180.0f, 0.0f);
+	kf3.rotAntebrazoIzquierdo = glm::vec3(0.0f, 180.0f, 20.0f);
 	kf3.rotManoIzquierda = glm::vec3(0.0f, 180.0f, 40.0f);
 
 	MalonKeyframe kf4;
 	kf4.rotBrazoIzquierdo = glm::vec3(0.0f, -135.0f, -20.0f);
-	kf4.rotAntebrazoIzquierdo = glm::vec3(0.0f, 180.0f, 0.0f);
+	kf4.rotAntebrazoIzquierdo = glm::vec3(0.0f, 180.0f, 30.0f);
 	kf4.rotManoIzquierda = glm::vec3(0.0f, 180.0f, 60.0f);
 
 	keyframes.push_back(kf1);
@@ -99,4 +109,12 @@ void Malon::Update(float deltaTime)
 
 	if (malonManoIzquierdaObj)
 		malonManoIzquierdaObj->transform.setRotation(interpMano.x, interpMano.y, interpMano.z);
+
+	// Animacion de levitacion de la Nimbus 2000
+	if (nimbus2000Obj)
+	{
+		nimbusTime += deltaTime * 2.5f;
+		float nimbusOffset = sin(nimbusTime) * 30.0f;
+		nimbus2000Obj->transform.setPosition(15.0f, -30.0f + nimbusOffset, 10.0f);
+	}
 }
