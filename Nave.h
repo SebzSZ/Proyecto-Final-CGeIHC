@@ -35,19 +35,17 @@ public:
 
     void Update(float deltaTime);
 
-    std::shared_ptr<GameObject> GetNaveObject() const { return naveObj; }
+    std::shared_ptr<GameObject> GetNaveObject() const { return naveContainer; }
 
 private:
     Model Nave_M;
     Model Ala_M;
 
+    std::shared_ptr<GameObject> naveContainer;
     std::shared_ptr<GameObject> naveObj;
     std::shared_ptr<GameObject> alaIzqObj;
     std::shared_ptr<GameObject> alaDerObj;
 
-    float posXavion;
-    float posYavion;
-    float posZavion;
     float movAvion_x;
     float movAvion_y;
     float giroAvion;

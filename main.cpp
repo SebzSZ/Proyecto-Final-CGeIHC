@@ -226,6 +226,8 @@ int main()
     // Nave Keyframes
     Nave nave;
     if (!nave.Initialize(matOpaco)) return -1;
+	nave.GetNaveObject()->transform.setScale(3.0f);
+	nave.GetNaveObject()->transform.setPosition(20.0f, 10.0f, 70.0f);
     nave.SetKeyframesIniciales();
     nave.DisplayMenu();
 

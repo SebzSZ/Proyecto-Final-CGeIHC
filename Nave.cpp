@@ -4,9 +4,6 @@
 
 Nave::Nave()
 {
-    posXavion = -10.0f;
-    posYavion = 4.0f;
-    posZavion = -10.0f;
     movAvion_x = 0.0f;
     movAvion_y = 0.0f;
     giroAvion = 0.0f;
@@ -29,9 +26,13 @@ bool Nave::Initialize(Material& material)
     if (!Nave_M.load("Models/nave.obj")) return false;
     if (!Ala_M.load("Models/ala.obj")) return false;
 
+    naveContainer = std::make_shared<GameObject>("NaveContainer", GameObjectType::EMPTY);
+
     naveObj = std::make_shared<GameObject>("Nave", GameObjectType::MODEL);
     naveObj->setModel(&Nave_M);
     naveObj->setMaterial(&material);
+
+    naveContainer->addChild(naveObj);
 
 
     alaIzqObj = std::make_shared<GameObject>("AlaIzquierda", GameObjectType::MODEL);
@@ -275,7 +276,7 @@ void Nave::Update(float deltaTime)
     InputControl();
     Animate();
 
-    glm::vec3 posblackhawk = glm::vec3(posXavion + movAvion_x, posYavion + movAvion_y, posZavion);
+    glm::vec3 posblackhawk = glm::vec3(movAvion_x, movAvion_y, 0.0f);
     naveObj->transform.setPosition(posblackhawk);
     naveObj->transform.setRotation(0.0f, giroAvion, 0.0f);
 
