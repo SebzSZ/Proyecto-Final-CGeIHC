@@ -11,7 +11,7 @@
 enum class CameraMode
 {
 	THIRD_PERSON,
-	AERIAL,	
+	AERIAL,
 	INTEREST_POINT
 };
 
@@ -75,7 +75,7 @@ private:
 	GLfloat thirdPersonDistance = 2.5f;
 	GLfloat thirdPersonHeight = 1.0f;
 	GLfloat orbitAngle = 0.0f;
-	GLfloat orbitSpeed = 45.0f;	
+	GLfloat orbitSpeed = 45.0f;
 	bool autoOrbit = false;
 	GLfloat manualOrbitSensitivity = 100.0f;
 
@@ -111,5 +111,9 @@ private:
 
 	void update();
 	void lookAt(const glm::vec3& target);
+
+public:
 	bool updateModeTransition(GLfloat deltaTime);
+
+private:
 };

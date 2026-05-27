@@ -200,13 +200,13 @@ int main()
     dekuTreeObj->transform.setRotation(0.0f, 65.6f, 0.0f);
     dekuTreeObj->transform.setScale(0.03f);
 
-    // Columbina — colocada en el interior de la Ópera Sinner's Finale
+    // Columbina
     Model columbina; if (!columbina.load("Models/Columbina.obj")) return -1;
     std::shared_ptr<GameObject> columbinaObj = std::make_shared<GameObject>("Columbina");
     columbinaObj->setModel(&columbina);
     columbinaObj->setMaterial(&matOpaco);
-    columbinaObj->transform.setPosition(90.0f, 0.9f, 42.5f);  // frente al escenario de la ópera
-    columbinaObj->transform.setRotation(0.0f, 180.0f, 0.0f);  // mirando hacia el interior
+    columbinaObj->transform.setPosition(7.13f, 0.122f, 10.18f);
+    columbinaObj->transform.setRotation(0.0f, 60.0f, 0.0f);
     columbinaObj->transform.setScale(0.5f);
 
     // Beacon Academy
@@ -410,14 +410,9 @@ int main()
             break;
 
         case CameraMode::AERIAL:
-            // Durante transición hacia aéreo, proveer el destino
-            if (camera.isInModeTransition())
-            {
-                camera.setTransitionTarget(aerialTarget, aerialLookAt);
-                camera.updateInterestPointCamera(deltaTime);
-                break;
-            }
-            // Control normal
+            // setTransitionTarget define hacia dónde volar al entrar en este modo.
+            // updateAerialCamera maneja internamente la transición y luego el control normal.
+            camera.setTransitionTarget(aerialTarget, aerialLookAt);
             camera.updateAerialCamera(input, deltaTime);
             break;
 
