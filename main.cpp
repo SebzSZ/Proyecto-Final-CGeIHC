@@ -264,6 +264,14 @@ int main()
 	Model torchModel; if (!torchModel.load("Models/Torch.obj")) return -1;
 	std::shared_ptr<GameObject> torches = CreateTorches(torchModel, matOpaco);
 
+	Model columbina; if (!columbina.load("Models/Columbina.obj")) return -1;
+	std::shared_ptr<GameObject> columbinaObj = std::make_shared<GameObject>("Columbina", GameObjectType::MODEL);
+	columbinaObj->setModel(&columbina);    
+	columbinaObj->setMaterial(&matOpaco);
+	columbinaObj->transform.setPosition(-10.13f, 0.122f, 7.18f);
+	columbinaObj->transform.setRotation(0.0f, 0.0f, 0.0f);
+    columbinaObj->transform.setScale(0.5f);
+
 	Malon malon;
 	if (!malon.Initialize(matOpaco, matBrillante)) return -1;
 
@@ -583,6 +591,9 @@ int main()
 
         // Antorchas del Hyrule Castle
         torches->draw(shader);
+
+		// Columbina
+		columbinaObj->draw(shader); 
 
 		// Ruby
         glEnable(GL_BLEND);
