@@ -26,16 +26,16 @@ bool Nave::Initialize(Material& material)
     if (!Nave_M.load("Models/nave.obj")) return false;
     if (!Ala_M.load("Models/ala.obj")) return false;
 
-    naveContainer = std::make_shared<GameObject>("NaveContainer", GameObjectType::EMPTY);
+    naveContainer = std::make_shared<GameObject>("NaveContainer");
 
-    naveObj = std::make_shared<GameObject>("Nave", GameObjectType::MODEL);
+    naveObj = std::make_shared<GameObject>("Nave");
     naveObj->setModel(&Nave_M);
     naveObj->setMaterial(&material);
 
     naveContainer->addChild(naveObj);
 
 
-    alaIzqObj = std::make_shared<GameObject>("AlaIzquierda", GameObjectType::MODEL);
+    alaIzqObj = std::make_shared<GameObject>("AlaIzquierda");
     alaIzqObj->setModel(&Ala_M);
     alaIzqObj->setMaterial(&material);
 
@@ -43,7 +43,7 @@ bool Nave::Initialize(Material& material)
     naveObj->addChild(alaIzqObj);
 
 
-    alaDerObj = std::make_shared<GameObject>("AlaDerecha", GameObjectType::MODEL);
+    alaDerObj = std::make_shared<GameObject>("AlaDerecha");
     alaDerObj->setModel(&Ala_M);
     alaDerObj->setMaterial(&material);
 

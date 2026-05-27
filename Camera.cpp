@@ -156,32 +156,34 @@ void Camera::updateThirdPersonCamera(const glm::vec3& targetPosition, GLfloat de
 	position = desiredPos;
 }
 
-// Modo aéreo
+// Modo aéreo — vuelo libre con mouse y WASD relativo a la cámara
 void Camera::updateAerialCamera(const InputManager& input, GLfloat deltaTime)
 {
+	// Procesar transición de entrada (V presionado) antes del control normal
+	if (updateModeTransition(deltaTime)) return;
+
 	if (currentMode != CameraMode::AERIAL) return;
 
-	GLfloat velocity = aerialMoveSpeed * deltaTime;
-
-	if (input.isKeyDown(GLFW_KEY_W)) aerialPosition.z -= velocity;
-	if (input.isKeyDown(GLFW_KEY_S)) aerialPosition.z += velocity;
-	if (input.isKeyDown(GLFW_KEY_A)) aerialPosition.x -= velocity;
-	if (input.isKeyDown(GLFW_KEY_D)) aerialPosition.x += velocity;
-	if (input.isKeyDown(GLFW_KEY_Q)) aerialPosition.y += velocity;
-	if (input.isKeyDown(GLFW_KEY_E)) aerialPosition.y -= velocity;
-
-	aerialPosition.y = glm::clamp(aerialPosition.y, 5.0f, 50.0f);
-
-	const float MAP_LIMIT = 70.0f;
-	aerialPosition.x = glm::clamp(aerialPosition.x, -MAP_LIMIT, MAP_LIMIT);
-	aerialPosition.z = glm::clamp(aerialPosition.z, -MAP_LIMIT, MAP_LIMIT);
-
-	position = aerialPosition;
-
-	glm::vec3 dirToCenter = glm::normalize(glm::vec3(0.0f) - aerialPosition);
-	lookAt(aerialPosition + dirToCenter * 30.0f);
-	pitch = -45.0f;
+	// Rotación con mouse
+	yaw += input.getMouseDeltaX() * 0.5f;
+	pitch -= input.getMouseDeltaY() * 0.5f;
+	if (pitch > 89.0f) pitch = 89.0f;
+	if (pitch < -89.0f) pitch = -89.0f;
 	update();
+
+	// Movimiento WASD relativo a la dirección horizontal de la cámara
+	GLfloat velocity = aerialMoveSpeed * deltaTime;
+	glm::vec3 flatFront = glm::normalize(glm::vec3(front.x, 0.0f, front.z));
+	glm::vec3 flatRight = glm::normalize(glm::cross(flatFront, worldUp));
+
+	if (input.isKeyDown(GLFW_KEY_W)) position += flatFront * velocity;
+	if (input.isKeyDown(GLFW_KEY_S)) position -= flatFront * velocity;
+	if (input.isKeyDown(GLFW_KEY_A)) position -= flatRight * velocity;
+	if (input.isKeyDown(GLFW_KEY_D)) position += flatRight * velocity;
+	if (input.isKeyDown(GLFW_KEY_Q)) position.y += velocity;
+	if (input.isKeyDown(GLFW_KEY_E)) position.y -= velocity;
+
+	aerialPosition = position;
 }
 
 // Modo de puntos de interés

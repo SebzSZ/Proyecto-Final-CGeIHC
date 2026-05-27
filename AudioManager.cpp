@@ -1,14 +1,18 @@
-#define DR_WAV_IMPLEMENTATION
 #define DR_MP3_IMPLEMENTATION
+#define DR_WAV_IMPLEMENTATION
+
+#include <cstdio>
+#include <glm.hpp>
+
 #include "dr_wav.h"
 #include "dr_mp3.h"
 
-#include <cstdio>
 #include "AudioManager.h"
 
+// Inicialización
 bool AudioManager::Initialize()
 {
-    // Abrir el dispositivo de audio predeterminado del sistema.
+    // Abrir el dispositivo de audio predeterminado del sistema
     device = alcOpenDevice(nullptr);
     if (!device)
     {
@@ -16,7 +20,7 @@ bool AudioManager::Initialize()
         return false;
     }
 
-    // Crear el contexto de OpenAL (equivalente al contexto de OpenGL).
+    // Crear el contexto de OpenAL
     context = alcCreateContext(device, nullptr);
     if (!context)
     {
@@ -37,35 +41,7 @@ bool AudioManager::Initialize()
     return true;
 }
 
-void AudioManager::shutdown()
-{
-    // Liberar todas las sources y buffers en GPU de audio
-    for (auto& [name, clip] : clips)
-    {
-        if (clip.source)
-        {
-            alSourceStop(clip.source);
-            alDeleteSources(1, &clip.source);
-        }
-        if (clip.buffer)
-            alDeleteBuffers(1, &clip.buffer);
-    }
-    clips.clear();
-
-    // Destruir contexto y cerrar dispositivo
-    if (context)
-    {
-        alcMakeContextCurrent(nullptr);
-        alcDestroyContext(context);
-        context = nullptr;
-    }
-    if (device)
-    {
-        alcCloseDevice(device);
-        device = nullptr;
-    }
-}
-
+// Carga de sonidos
 bool AudioManager::loadWAV(const std::string& name, const std::string& filePath)
 {
     if (clips.count(name))
@@ -137,8 +113,7 @@ bool AudioManager::loadMP3(const std::string& name, const std::string& filePath)
     return true;
 }
 
-//Reproduccion
-
+// Reproducción y control
 void AudioManager::play(const std::string& name, bool loop, float gain)
 {
     auto it = clips.find(name);
@@ -198,6 +173,98 @@ bool AudioManager::isPlaying(const std::string& name) const
     return state == AL_PLAYING;
 }
 
+// Fade in/out
+void AudioManager::fadeIn(const std::string& name, float duration, bool loop, bool resume)
+{
+    auto it = clips.find(name);
+    if (it == clips.end())
+    {
+        printf("[Audio] Error: '%s' no esta cargado.\n", name.c_str());
+        return;
+    }
+
+    // Si no es resume, iniciar desde el principio
+    if (!resume)
+    {
+        alSourceRewind(it->second.source);
+        alSourcei(it->second.source, AL_LOOPING, loop ? AL_TRUE : AL_FALSE);
+        alSourcef(it->second.source, AL_GAIN, 0.0f);
+        alSourcePlay(it->second.source);
+    }
+    else
+    {
+        // Si es resume, reanudar desde donde estaba pausado
+        alSourcei(it->second.source, AL_LOOPING, loop ? AL_TRUE : AL_FALSE);
+        alSourcef(it->second.source, AL_GAIN, 0.0f);
+        alSourcePlay(it->second.source);
+    }
+
+    // Configurar fade
+    fadeStates[name] = { FadeState::FADING_IN, 0.0f, duration, loop };
+}
+
+void AudioManager::fadeOut(const std::string& name, float duration)
+{
+    auto it = clips.find(name);
+    if (it == clips.end())
+    {
+        printf("[Audio] Error: '%s' no esta cargado.\n", name.c_str());
+        return;
+    }
+
+    if (!isPlaying(name))
+        return;
+
+    // Configurar fade
+    fadeStates[name] = { FadeState::FADING_OUT, 0.0f, duration, false };
+}
+
+void AudioManager::update(float deltaTime)
+{
+    for (auto it = fadeStates.begin(); it != fadeStates.end(); )
+    {
+        const std::string& name = it->first;
+        FadeInfo& fadeInfo = it->second;
+
+        if (fadeInfo.state == FadeState::NONE)
+        {
+            ++it;
+            continue;
+        }
+
+        fadeInfo.currentTime += deltaTime;
+        float progress = glm::clamp(fadeInfo.currentTime / fadeInfo.duration, 0.0f, 1.0f);
+
+        auto clipIt = clips.find(name);
+        if (clipIt != clips.end())
+        {
+            if (fadeInfo.state == FadeState::FADING_IN)
+            {
+                alSourcef(clipIt->second.source, AL_GAIN, progress);
+
+                if (progress >= 1.0f)
+                {
+                    fadeInfo.state = FadeState::NONE;
+                }
+            }
+            else if (fadeInfo.state == FadeState::FADING_OUT)
+            {
+                float currentGain = 1.0f - progress;
+                alSourcef(clipIt->second.source, AL_GAIN, currentGain);
+
+                if (progress >= 1.0f)
+                {
+                    alSourcePause(clipIt->second.source);
+                    fadeInfo.state = FadeState::NONE;
+                }
+            }
+        }
+
+        ++it;
+    }
+}
+
+// Audio 3D
 void AudioManager::setSourcePosition(const std::string& name, const glm::vec3& pos)
 {
     auto it = clips.find(name);
@@ -218,6 +285,7 @@ void AudioManager::setListenerPosition(const glm::vec3& position,
     alListenerfv(AL_ORIENTATION, orientation);
 }
 
+// Métodos auxiliares
 ALuint AudioManager::createSource(ALuint buffer, bool loop, float gain)
 {
     ALuint source;
@@ -229,7 +297,7 @@ ALuint AudioManager::createSource(ALuint buffer, bool loop, float gain)
     alSourcef(source, AL_GAIN, gain);
     alSourcef(source, AL_PITCH, 1.0f);
 
-    // Posicion inicial en el origen; se actualiza con setSourcePosition()
+    // Posicion inicial en el origen, se actualiza con setSourcePosition()
     alSource3f(source, AL_POSITION, 0.0f, 0.0f, 0.0f);
     alSource3f(source, AL_VELOCITY, 0.0f, 0.0f, 0.0f);
 
@@ -242,6 +310,36 @@ void AudioManager::checkError(const std::string& where) const
     ALenum error = alGetError();
     if (error != AL_NO_ERROR)
         printf("[Audio] Error en '%s': 0x%X\n", where.c_str(), error);
+}
+
+// Limpieza
+void AudioManager::shutdown()
+{
+    // Liberar todas las sources y buffers en GPU de audio
+    for (auto& [name, clip] : clips)
+    {
+        if (clip.source)
+        {
+            alSourceStop(clip.source);
+            alDeleteSources(1, &clip.source);
+        }
+        if (clip.buffer)
+            alDeleteBuffers(1, &clip.buffer);
+    }
+    clips.clear();
+
+    // Destruir contexto y cerrar dispositivo
+    if (context)
+    {
+        alcMakeContextCurrent(nullptr);
+        alcDestroyContext(context);
+        context = nullptr;
+    }
+    if (device)
+    {
+        alcCloseDevice(device);
+        device = nullptr;
+    }
 }
 
 AudioManager::~AudioManager()

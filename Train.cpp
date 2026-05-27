@@ -14,9 +14,9 @@ bool Train::Initialize(Material& matOpaco)
 	if (!bigWheelModel.load("Models/Train_BigWheel.obj")) return false;
 	if (!smallWheelModel.load("Models/Train_SmallWheel.obj")) return false;
 
-	trainObj = std::make_shared<GameObject>("Train Container", GameObjectType::MODEL);
+	trainObj = std::make_shared<GameObject>("Train Container");
 
-	engineCar = std::make_shared<GameObject>("Big Car", GameObjectType::MODEL);
+	engineCar = std::make_shared<GameObject>("Big Car");
 	engineCar->setModel(&bigCarModel);
 	engineCar->setMaterial(&matOpaco);
 	engineCar->transform.setPosition(0.0f, 1.25f, 0.0f);
@@ -24,33 +24,33 @@ bool Train::Initialize(Material& matOpaco)
 	trainObj->addChild(engineCar);
 
 	// Ruedas grandes 
-	std::shared_ptr<GameObject> bigWheel1 = std::make_shared<GameObject>("Big Wheel 1", GameObjectType::MODEL);
+	std::shared_ptr<GameObject> bigWheel1 = std::make_shared<GameObject>("Big Wheel 1");
 	bigWheel1->setModel(&bigWheelModel); bigWheel1->setMaterial(&matOpaco);
 	bigWheel1->transform.setPosition(-0.6f, -0.82f, 0.75f); bigWheel1->transform.setScale(1.0f);
 	engineCar->addChild(bigWheel1); wheels.push_back(bigWheel1);
 
-	std::shared_ptr<GameObject> bigWheel2 = std::make_shared<GameObject>("Big Wheel 2", GameObjectType::MODEL);
+	std::shared_ptr<GameObject> bigWheel2 = std::make_shared<GameObject>("Big Wheel 2");
 	bigWheel2->setModel(&bigWheelModel); bigWheel2->setMaterial(&matOpaco);
 	bigWheel2->transform.setPosition(0.6f, -0.82f, 0.75f); bigWheel2->transform.setRotation(0.0f, 180.0f, 0.0f); bigWheel2->transform.setScale(1.0f);
 	engineCar->addChild(bigWheel2); wheels.push_back(bigWheel2);
 
 	// Ruedas pequeñas 
-	std::shared_ptr<GameObject> smallWheel1 = std::make_shared<GameObject>("Small Wheel 1", GameObjectType::MODEL);
+	std::shared_ptr<GameObject> smallWheel1 = std::make_shared<GameObject>("Small Wheel 1");
 	smallWheel1->setModel(&smallWheelModel); smallWheel1->setMaterial(&matOpaco);
 	smallWheel1->transform.setPosition(-0.6f, -0.95f, -0.25f); smallWheel1->transform.setScale(1.0f);
 	engineCar->addChild(smallWheel1); wheels.push_back(smallWheel1);
 
-	std::shared_ptr<GameObject> smallWheel2 = std::make_shared<GameObject>("Small Wheel 2", GameObjectType::MODEL);
+	std::shared_ptr<GameObject> smallWheel2 = std::make_shared<GameObject>("Small Wheel 2");
 	smallWheel2->setModel(&smallWheelModel); smallWheel2->setMaterial(&matOpaco);
 	smallWheel2->transform.setPosition(0.6f, -0.95f, -0.25f); smallWheel2->transform.setRotation(0.0f, 180.0f, 0.0f); smallWheel2->transform.setScale(1.0f);
 	engineCar->addChild(smallWheel2); wheels.push_back(smallWheel2);
 
-	std::shared_ptr<GameObject> smallWheel3 = std::make_shared<GameObject>("Small Wheel 3", GameObjectType::MODEL);
+	std::shared_ptr<GameObject> smallWheel3 = std::make_shared<GameObject>("Small Wheel 3");
 	smallWheel3->setModel(&smallWheelModel); smallWheel3->setMaterial(&matOpaco);
 	smallWheel3->transform.setPosition(-0.6f, -0.95f, -1.20f); smallWheel3->transform.setScale(1.0f);
 	engineCar->addChild(smallWheel3); wheels.push_back(smallWheel3);
 
-	std::shared_ptr<GameObject> smallWheel4 = std::make_shared<GameObject>("Small Wheel 4", GameObjectType::MODEL);
+	std::shared_ptr<GameObject> smallWheel4 = std::make_shared<GameObject>("Small Wheel 4");
 	smallWheel4->setModel(&smallWheelModel); smallWheel4->setMaterial(&matOpaco);
 	smallWheel4->transform.setPosition(0.6f, -0.95f, -1.20f); smallWheel4->transform.setRotation(0.0f, 180.0f, 0.0f); smallWheel4->transform.setScale(1.0f);
 	engineCar->addChild(smallWheel4); wheels.push_back(smallWheel4);
@@ -68,7 +68,7 @@ bool Train::Initialize(Material& matOpaco)
 void Train::CreateWagon(int i, Material& matOpaco)
 {
 	std::string wagonName = "Wagon " + std::to_string(i + 1);
-	std::shared_ptr<GameObject> wagonObj = std::make_shared<GameObject>(wagonName, GameObjectType::MODEL);
+	std::shared_ptr<GameObject> wagonObj = std::make_shared<GameObject>(wagonName);
 	wagonObj->setModel(&smallCarModel);
 	wagonObj->setMaterial(&matOpaco);
 	wagonObj->transform.setPosition(0.0f, 1.0f, 0.0f);
@@ -76,22 +76,22 @@ void Train::CreateWagon(int i, Material& matOpaco)
 	trainObj->addChild(wagonObj);
 	wagons.push_back(wagonObj);
 
-	std::shared_ptr<GameObject> w1 = std::make_shared<GameObject>(wagonName + " Wheel 1", GameObjectType::MODEL);
+	std::shared_ptr<GameObject> w1 = std::make_shared<GameObject>(wagonName + " Wheel 1");
 	w1->setModel(&smallWheelModel); w1->setMaterial(&matOpaco);
 	w1->transform.setPosition(-0.6f, -0.71f, -0.7f); w1->transform.setScale(1.0f);
 	wagonObj->addChild(w1); wheels.push_back(w1);
 
-	std::shared_ptr<GameObject> w2 = std::make_shared<GameObject>(wagonName + " Wheel 2", GameObjectType::MODEL);
+	std::shared_ptr<GameObject> w2 = std::make_shared<GameObject>(wagonName + " Wheel 2");
 	w2->setModel(&smallWheelModel); w2->setMaterial(&matOpaco);
 	w2->transform.setPosition(0.6f, -0.71f, -0.7f); w2->transform.setRotation(0.0f, 180.0f, 0.0f); w2->transform.setScale(1.0f);
 	wagonObj->addChild(w2); wheels.push_back(w2);
 
-	std::shared_ptr<GameObject> w3 = std::make_shared<GameObject>(wagonName + " Wheel 3", GameObjectType::MODEL);
+	std::shared_ptr<GameObject> w3 = std::make_shared<GameObject>(wagonName + " Wheel 3");
 	w3->setModel(&smallWheelModel); w3->setMaterial(&matOpaco);
 	w3->transform.setPosition(-0.6f, -0.71f, 0.35f); w3->transform.setScale(1.0f);
 	wagonObj->addChild(w3); wheels.push_back(w3);
 
-	std::shared_ptr<GameObject> w4 = std::make_shared<GameObject>(wagonName + " Wheel 4", GameObjectType::MODEL);
+	std::shared_ptr<GameObject> w4 = std::make_shared<GameObject>(wagonName + " Wheel 4");
 	w4->setModel(&smallWheelModel); w4->setMaterial(&matOpaco);
 	w4->transform.setPosition(0.6f, -0.71f, 0.35f); w4->transform.setRotation(0.0f, 180.0f, 0.0f); w4->transform.setScale(1.0f);
 	wagonObj->addChild(w4); wheels.push_back(w4);
