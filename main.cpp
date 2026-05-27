@@ -103,78 +103,6 @@ std::shared_ptr<GameObject> CreateAvatar(
     return rubyObj;
 }
 
-void CreateTorchPointLights()
-{
-    // Antorcha 1
-    pointLights[0] = PointLight(1.0f, 0.5f, 0.0f, // Color naranja (fuego)
-        0.2f, 1.0f,
-        6.38f, 4.0f, 0.03f, // Posición (un poco más arriba del modelo)
-        1.0f, 0.7f, 1.8f);
-    pointLightCount++;
-
-    // Antorcha 2
-    pointLights[1] = PointLight(1.0f, 0.5f, 0.0f, // Color naranja (fuego)
-        0.2f, 1.0f,
-        32.9f, 4.0f, 0.03f, // Posición
-        1.0f, 0.7f, 1.8f);
-    pointLightCount++;
-
-    // Antorcha 3
-    pointLights[2] = PointLight(1.0f, 0.5f, 0.0f, // Color naranja (fuego)
-        0.2f, 1.0f,
-        24.0f, 3.0f, 5.57f, // Posición
-        1.0f, 0.7f, 1.8f);
-    pointLightCount++;
-
-    // Antorcha 4
-    pointLights[3] = PointLight(1.0f, 0.5f, 0.0f, // Color naranja (fuego)
-        0.2f, 1.0f,
-        16.06f, 3.0f, 5.57f, // Posición
-        1.0f, 0.7f, 1.8f);  
-    pointLightCount++;
-}
-
-std::shared_ptr<GameObject> CreateTorches(Model& torchModel, Material& matOpaco)
-{
-    std::shared_ptr<GameObject> container = std::make_shared<GameObject>("Torches", GameObjectType::MODEL);
-
-    std::shared_ptr<GameObject> torchObj1 = std::make_shared<GameObject>("Torch", GameObjectType::MODEL);
-    torchObj1->setModel(&torchModel);
-    torchObj1->setMaterial(&matOpaco);
-    torchObj1->transform.setPosition(6.38f, 2.85f, 0.03f);
-    torchObj1->transform.setRotation(0.0f, 90.0f, 0.0f);
-    torchObj1->transform.setScale(0.5f);
-    container->addChild(torchObj1);
-
-    std::shared_ptr<GameObject> torchObj2 = std::make_shared<GameObject>("Torch", GameObjectType::MODEL);
-    torchObj2->setModel(&torchModel);
-    torchObj2->setMaterial(&matOpaco);
-    torchObj2->transform.setPosition(32.9f, 2.85f, 0.03f);
-    torchObj2->transform.setRotation(0.0f, 90.0f, 0.0f);
-    torchObj2->transform.setScale(0.5f);
-    container->addChild(torchObj2);
-
-    std::shared_ptr<GameObject> torchObj3 = std::make_shared<GameObject>("Torch", GameObjectType::MODEL);
-    torchObj3->setModel(&torchModel);
-    torchObj3->setMaterial(&matOpaco);
-    torchObj3->transform.setPosition(24.0f, 1.85f, 5.57f);
-    torchObj3->transform.setRotation(0.0f, 135.0f, 0.0f);
-    torchObj3->transform.setScale(0.5f);
-    container->addChild(torchObj3);
-
-    std::shared_ptr<GameObject> torchObj4 = std::make_shared<GameObject>("Torch", GameObjectType::MODEL);
-    torchObj4->setModel(&torchModel);
-    torchObj4->setMaterial(&matOpaco);
-    torchObj4->transform.setPosition(16.06f, 1.85f, 5.57f);
-    torchObj4->transform.setRotation(0.0f, 47.21f, 0.0f);
-    torchObj4->transform.setScale(0.5f);
-    container->addChild(torchObj4);
-
-    CreateTorchPointLights();
-
-    return container;
-}
-
 // ─────────────────────────────────────────────────────────────────────────────
 int main()
 {
@@ -251,34 +179,45 @@ int main()
     floorObj->loadMesh(floorData);
     floorObj->setTextureID(floorTexture.getID());
     floorObj->setMaterial(&matOpaco);
-    floorObj->transform.setScale(50.0f, 1.0f, 50.0f);
-
+    floorObj->transform.setScale(100.0f, 1.0f, 100.0f);
+	floorObj->transform.setPosition(20.0f, 0.0f, 0.0f);
+    
+    // Deku Tree
 	Model dekuTreeModel; if (!dekuTreeModel.load("Models/DekuTree.obj")) return -1;
 	std::shared_ptr<GameObject> dekuTreeObj = std::make_shared<GameObject>("DekuTree", GameObjectType::MODEL);
     dekuTreeObj->setModel(&dekuTreeModel);
 	dekuTreeObj->setMaterial(&matOpaco);
-    dekuTreeObj->transform.setPosition(-17.52f, 0.0f, 7.62f);
-    dekuTreeObj->transform.setRotation(0.0f, 35.6f, 0.0f);
-	dekuTreeObj->transform.setScale(0.01f);
+    dekuTreeObj->transform.setPosition(-12.9f, 0.0f, 12.9f);
+	dekuTreeObj->transform.setRotation(0.0f, 65.6f, 0.0f);
+	dekuTreeObj->transform.setScale(0.03f);
 
-	Model torchModel; if (!torchModel.load("Models/Torch.obj")) return -1;
-	std::shared_ptr<GameObject> torches = CreateTorches(torchModel, matOpaco);
-
+	// Columbina
 	Model columbina; if (!columbina.load("Models/Columbina.obj")) return -1;
 	std::shared_ptr<GameObject> columbinaObj = std::make_shared<GameObject>("Columbina", GameObjectType::MODEL);
 	columbinaObj->setModel(&columbina);    
 	columbinaObj->setMaterial(&matOpaco);
-	columbinaObj->transform.setPosition(-10.13f, 0.122f, 7.18f);
-	columbinaObj->transform.setRotation(0.0f, 0.0f, 0.0f);
+	columbinaObj->transform.setPosition(7.13f, 0.122f, 10.18f);
+	columbinaObj->transform.setRotation(0.0f, 60.0f, 0.0f);
     columbinaObj->transform.setScale(0.5f);
+
+    // Beacon Academy
+	Model beaconAcademy; if (!beaconAcademy.load("Models/Beacon.obj")) return -1;
+	std::shared_ptr<GameObject> beaconAcademyObj = std::make_shared<GameObject>("BeaconAcademy", GameObjectType::MODEL);
+	beaconAcademyObj->setModel(&beaconAcademy);
+	beaconAcademyObj->setMaterial(&matOpaco);
+	beaconAcademyObj->transform.setPosition(20.5f, -0.2f, 70.0f);
+	beaconAcademyObj->transform.setRotation(-90.0f, 0.0f, -90.0f);
+	beaconAcademyObj->transform.setScale(0.01f);
 
 	Malon malon;
 	if (!malon.Initialize(matOpaco, matBrillante)) return -1;
 
-	Castle castle;
-    if (!castle.Initialize(matOpaco)) return -1;
+	Castle castle; 
+	if (!castle.Initialize(matOpaco, pointLights, pointLightCount)) return -1;
+    castle.GetCastleObject()->transform.setScale(2.0f, 2.0f, 2.0f);
+	castle.GetCastleObject()->transform.setPosition(-20.0f, -1.0f, 0.0f);
 
-    Train train;
+	Train train;
     if (!train.Initialize(matOpaco)) return -1;
 
     float trainSpeed = 5.0f;
@@ -589,11 +528,11 @@ int main()
 		// Malon y Nimbus 2000
 		malon.GetMalonObject()->draw(shader);
 
-        // Antorchas del Hyrule Castle
-        torches->draw(shader);
-
 		// Columbina
 		columbinaObj->draw(shader); 
+
+		// Beacon Academy
+		beaconAcademyObj->draw(shader);
 
 		// Ruby
         glEnable(GL_BLEND);

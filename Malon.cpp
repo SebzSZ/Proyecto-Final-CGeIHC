@@ -10,8 +10,8 @@ bool Malon::Initialize(Material& matOpaco, Material& matBrillante)
 	malonCuerpoObj = std::make_shared<GameObject>("Malon Cuerpo", GameObjectType::MODEL);
 	malonCuerpoObj->setModel(&malonCuerpoModel);
 	malonCuerpoObj->setMaterial(&matOpaco);
-	malonCuerpoObj->transform.setPosition(-22.48f, 0.0f, 18.0f);
-	malonCuerpoObj->transform.setRotation(0.0f, 47.35f, 0.0f);
+	malonCuerpoObj->transform.setPosition(-5.46f, 0.0f, 16.3f);
+	malonCuerpoObj->transform.setRotation(0.0f, 53.35f, 0.0f);
 	malonCuerpoObj->transform.setScale(0.01f);
 
 	if (!malonBrazoIzquierdoModel.load("Models/Malon_BrazoIzquierdo.obj")) return false;
