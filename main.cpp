@@ -183,6 +183,11 @@ std::shared_ptr<GameObject> CreateStreetLamps(Model& streetLampModel, Material& 
 	return container;
 }
 
+void CreateYang()
+{
+
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 int main()
 {
@@ -292,6 +297,36 @@ int main()
 	// Street Lamps
 	Model streetLampModel; if (!streetLampModel.load("Models/StreetLamp.obj")) return -1;
 	std::shared_ptr<GameObject> streetLampsContainer = CreateStreetLamps(streetLampModel, matOpaco);
+
+    // Yang
+	Model yangCuerpo; if (!yangCuerpo.load("Models/Yang_Cuerpo.obj")) return -1;
+	std::shared_ptr<GameObject> yangCuerpoObj = std::make_shared<GameObject>("YangCuerpo", GameObjectType::MODEL);
+	yangCuerpoObj->setModel(&yangCuerpo);
+	yangCuerpoObj->setMaterial(&matOpaco);
+	yangCuerpoObj->transform.setPosition(20.0f, 0.7f, -6.25f);
+    yangCuerpoObj->transform.setScale(0.3f);
+
+    Model yangBrazo; if (!yangBrazo.load("Models/Yang_Brazo.obj")) return -1;
+    std::shared_ptr<GameObject> yangBrazoObj = std::make_shared<GameObject>("YangBrazo", GameObjectType::MODEL);
+    yangBrazoObj->setModel(&yangBrazo);
+    yangBrazoObj->setMaterial(&matOpaco);
+	yangBrazoObj->transform.setPosition(-0.4f, 5.2f, -0.2f);
+	yangBrazoObj->transform.setRotation(0.0f, 0.0f, -40.0f);
+	yangCuerpoObj->addChild(yangBrazoObj);
+
+	Model yangAntebrazo; if (!yangAntebrazo.load("Models/Yang_Antebrazo.obj")) return -1;
+	std::shared_ptr<GameObject> yangAntebrazoObj = std::make_shared<GameObject>("YangAntebrazo", GameObjectType::MODEL);
+	yangAntebrazoObj->setModel(&yangAntebrazo);
+	yangAntebrazoObj->setMaterial(&matOpaco);
+	yangAntebrazoObj->transform.setPosition(-0.5f, -0.75f, -0.1f);
+	yangAntebrazoObj->transform.setRotation(0.0f, 0.0f, -20.0f);
+	yangBrazoObj->addChild(yangAntebrazoObj);
+
+	// Animacion sencilla de saludo para Yang
+	float yangWaveTime = 0.0f;
+	float yangWaveSpeed = 3.5f;
+	float yangWaveAmplitude = 35.0f;
+	float yangForearmBaseZ = -40.0f;
 
 	Malon malon;
 	if (!malon.Initialize(matOpaco, matBrillante)) return -1;
@@ -502,6 +537,11 @@ int main()
         malon.Update(deltaTime);
         nave.Update(deltaTime);
 
+        // Animacion de saludo de Yang
+        yangWaveTime += deltaTime * yangWaveSpeed;
+        float yangWaveAngleZ = yangForearmBaseZ + sin(yangWaveTime) * yangWaveAmplitude;
+        yangAntebrazoObj->transform.setRotation(0.0f, 0.0f, yangWaveAngleZ);
+
         // Movimiento de Ruby — solo en modo THIRD_PERSON y sin transición activa
         float rubyMoveSpeed = 8.0f;
         glm::vec3 cameraDirection = camera.getDirection();
@@ -641,6 +681,9 @@ int main()
 
         // Street Lamps
 		streetLampsContainer->draw(shader);
+
+        // Yang
+		yangCuerpoObj->draw(shader);
 
 		// Ruby
         glEnable(GL_BLEND);
