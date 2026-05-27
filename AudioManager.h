@@ -32,6 +32,11 @@ public:
 	void setGain(const std::string& name, float gain);
 	bool isPlaying(const std::string& name) const;
 
+	// Fade in/out
+	void fadeIn(const std::string& name, float duration, bool loop = false, bool resume = false);
+	void fadeOut(const std::string& name, float duration);
+	void update(float deltaTime);
+
 	// Audio 3D
 	void setSourcePosition(const std::string& name, const glm::vec3& pos);
 	void setListenerPosition(const glm::vec3& position, const glm::vec3& front, const glm::vec3& up);
@@ -53,12 +58,28 @@ private:
 		ALuint source = 0;
 	};
 
+	enum FadeState
+	{
+		NONE,
+		FADING_IN,
+		FADING_OUT
+	};
+
+	struct FadeInfo
+	{
+		FadeState state = NONE;
+		float currentTime = 0.0f;
+		float duration = 0.0f;
+		bool loop = false;
+	};
+
 	// Variables de OpenAL
 	ALCdevice* device = nullptr;
 	ALCcontext* context = nullptr;
 
 	// Almacenamiento de sonidos
 	std::unordered_map<std::string, AudioClip> clips;
+	std::unordered_map<std::string, FadeInfo> fadeStates;
 
 	// Métodos auxiliares
 	ALuint createSource(ALuint buffer, bool loop, float gain);

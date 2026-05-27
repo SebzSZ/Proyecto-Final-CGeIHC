@@ -7,7 +7,7 @@ Malon::Malon() : currentKeyframeIndex(0), nextKeyframeIndex(1), transitionProgre
 bool Malon::Initialize(Material& matOpaco, Material& matBrillante)
 {
 	if (!malonCuerpoModel.load("Models/Malon_Cuerpo.obj")) return false;
-	malonCuerpoObj = std::make_shared<GameObject>("Malon Cuerpo", GameObjectType::MODEL);
+	malonCuerpoObj = std::make_shared<GameObject>("Malon Cuerpo");
 	malonCuerpoObj->setModel(&malonCuerpoModel);
 	malonCuerpoObj->setMaterial(&matOpaco);
 	malonCuerpoObj->transform.setPosition(-5.46f, 0.0f, 16.3f);
@@ -15,7 +15,7 @@ bool Malon::Initialize(Material& matOpaco, Material& matBrillante)
 	malonCuerpoObj->transform.setScale(0.01f);
 
 	if (!malonBrazoIzquierdoModel.load("Models/Malon_BrazoIzquierdo.obj")) return false;
-	malonBrazoIzquierdoObj = std::make_shared<GameObject>("Malon Brazo Izquierdo", GameObjectType::MODEL);
+	malonBrazoIzquierdoObj = std::make_shared<GameObject>("Malon Brazo Izquierdo");
 	malonBrazoIzquierdoObj->setModel(&malonBrazoIzquierdoModel);
 	malonBrazoIzquierdoObj->setMaterial(&matOpaco);
 	malonBrazoIzquierdoObj->transform.setPosition(-13.0f, 133.0f, 0.0f);
@@ -23,7 +23,7 @@ bool Malon::Initialize(Material& matOpaco, Material& matBrillante)
 	malonCuerpoObj->addChild(malonBrazoIzquierdoObj);
 
 	if (!malonAntebrazoIzquierdoModel.load("Models/Malon_AntebrazoIzquierdo.obj")) return false;
-	malonAntebrazoIzquierdoObj = std::make_shared<GameObject>("Malon Antebrazo Izquierdo", GameObjectType::MODEL);
+	malonAntebrazoIzquierdoObj = std::make_shared<GameObject>("Malon Antebrazo Izquierdo");
 	malonAntebrazoIzquierdoObj->setModel(&malonAntebrazoIzquierdoModel);
 	malonAntebrazoIzquierdoObj->setMaterial(&matOpaco);
 	malonAntebrazoIzquierdoObj->transform.setPosition(23.0f, -10.0f, 3.0f);
@@ -31,7 +31,7 @@ bool Malon::Initialize(Material& matOpaco, Material& matBrillante)
 	malonBrazoIzquierdoObj->addChild(malonAntebrazoIzquierdoObj);
 
 	if (!malonManoIzquierdaModel.load("Models/Malon_ManoIzquierda.obj")) return false;
-	malonManoIzquierdaObj = std::make_shared<GameObject>("Malon Mano Izquierda", GameObjectType::MODEL);
+	malonManoIzquierdaObj = std::make_shared<GameObject>("Malon Mano Izquierda");
 	malonManoIzquierdaObj->setModel(&malonManoIzquierdaModel);
 	malonManoIzquierdaObj->setMaterial(&matOpaco);
 	malonManoIzquierdaObj->transform.setPosition(-22.0f, -16.0f, 4.0f);
@@ -39,7 +39,7 @@ bool Malon::Initialize(Material& matOpaco, Material& matBrillante)
 	malonAntebrazoIzquierdoObj->addChild(malonManoIzquierdaObj);
 
 	if (!nimbus2000Model.load("Models/Nimbus2000.obj")) return false;
-	nimbus2000Obj = std::make_shared<GameObject>("Nimbus 2000", GameObjectType::MODEL);
+	nimbus2000Obj = std::make_shared<GameObject>("Nimbus 2000");
 	nimbus2000Obj->setModel(&nimbus2000Model);
 	nimbus2000Obj->setMaterial(&matBrillante);
 

@@ -24,6 +24,7 @@ public:
 
 	std::shared_ptr<GameObject> GetMalonObject() const { return malonCuerpoObj; }
 	std::shared_ptr<GameObject> GetManoIzquierda() const { return malonManoIzquierdaObj; }
+	glm::vec3 GetPosition() const { return malonCuerpoObj->transform.getPosition(); }
 
 private:
 	std::shared_ptr<GameObject> malonCuerpoObj;

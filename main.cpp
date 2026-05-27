@@ -30,6 +30,7 @@
 #include "Castle.h"
 #include "Malon.h"
 #include "Nave.h"
+#include "Tree.h"
 
 // Rutas de shaders
 static const char* VERT_SHADER = "shaders/shader.vert";
@@ -116,7 +117,16 @@ int main()
 
     // Reproducir música
     audioManager.loadMP3("bgMusic", "Sounds/bgMusic.mp3");
-    //audioManager.play("bgMusic", true, 0.5f);
+    audioManager.play("bgMusic", true, 0.5f);
+
+    // Cargar sonido de Malon
+    audioManager.loadWAV("malonSound", "Sounds/malonSound.wav");
+
+    // Cargar sonido de Opera
+    audioManager.loadMP3("operaSound", "Sounds/operaMusic.mp3");
+
+    // Cargar sonido del Tren (usa un alias del sonido de Malon)
+    audioManager.loadWAV("trainSound", "Sounds/trainSound.wav");
 
     // Configuración inicial de la cámara
     Camera camera(glm::vec3(0.0f, 5.0f, 5.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, 0.0f, 5.0f, 0.1f);
@@ -179,44 +189,52 @@ int main()
     floorObj->setTextureID(floorTexture.getID());
     floorObj->setMaterial(&matOpaco);
     floorObj->transform.setScale(100.0f, 1.0f, 100.0f);
-	floorObj->transform.setPosition(20.0f, 0.0f, 0.0f);
-    
-    // Deku Tree
-	Model dekuTreeModel; if (!dekuTreeModel.load("Models/DekuTree.obj")) return -1;
-	std::shared_ptr<GameObject> dekuTreeObj = std::make_shared<GameObject>("DekuTree", GameObjectType::MODEL);
-    dekuTreeObj->setModel(&dekuTreeModel);
-	dekuTreeObj->setMaterial(&matOpaco);
-    dekuTreeObj->transform.setPosition(-12.9f, 0.0f, 12.9f);
-	dekuTreeObj->transform.setRotation(0.0f, 65.6f, 0.0f);
-	dekuTreeObj->transform.setScale(0.03f);
+    floorObj->transform.setPosition(20.0f, 0.0f, 0.0f);
 
-	// Columbina
-	Model columbina; if (!columbina.load("Models/Columbina.obj")) return -1;
-	std::shared_ptr<GameObject> columbinaObj = std::make_shared<GameObject>("Columbina", GameObjectType::MODEL);
-	columbinaObj->setModel(&columbina);    
-	columbinaObj->setMaterial(&matOpaco);
-	columbinaObj->transform.setPosition(7.13f, 0.122f, 10.18f);
-	columbinaObj->transform.setRotation(0.0f, 60.0f, 0.0f);
+    // Deku Tree
+    Model dekuTreeModel; if (!dekuTreeModel.load("Models/DekuTree.obj")) return -1;
+    std::shared_ptr<GameObject> dekuTreeObj = std::make_shared<GameObject>("DekuTree");
+    dekuTreeObj->setModel(&dekuTreeModel);
+    dekuTreeObj->setMaterial(&matOpaco);
+    dekuTreeObj->transform.setPosition(-12.9f, 0.0f, 12.9f);
+    dekuTreeObj->transform.setRotation(0.0f, 65.6f, 0.0f);
+    dekuTreeObj->transform.setScale(0.03f);
+
+    // Columbina — colocada en el interior de la Ópera Sinner's Finale
+    Model columbina; if (!columbina.load("Models/Columbina.obj")) return -1;
+    std::shared_ptr<GameObject> columbinaObj = std::make_shared<GameObject>("Columbina");
+    columbinaObj->setModel(&columbina);
+    columbinaObj->setMaterial(&matOpaco);
+    columbinaObj->transform.setPosition(90.0f, 0.9f, 42.5f);  // frente al escenario de la ópera
+    columbinaObj->transform.setRotation(0.0f, 180.0f, 0.0f);  // mirando hacia el interior
     columbinaObj->transform.setScale(0.5f);
 
     // Beacon Academy
-	Model beaconAcademy; if (!beaconAcademy.load("Models/Beacon.obj")) return -1;
-	std::shared_ptr<GameObject> beaconAcademyObj = std::make_shared<GameObject>("BeaconAcademy", GameObjectType::MODEL);
-	beaconAcademyObj->setModel(&beaconAcademy);
-	beaconAcademyObj->setMaterial(&matOpaco);
-	beaconAcademyObj->transform.setPosition(20.5f, -0.2f, 70.0f);
-	beaconAcademyObj->transform.setRotation(-90.0f, 0.0f, -90.0f);
-	beaconAcademyObj->transform.setScale(0.01f);
+    Model beaconAcademy; if (!beaconAcademy.load("Models/Beacon.obj")) return -1;
+    std::shared_ptr<GameObject> beaconAcademyObj = std::make_shared<GameObject>("BeaconAcademy");
+    beaconAcademyObj->setModel(&beaconAcademy);
+    beaconAcademyObj->setMaterial(&matOpaco);
+    beaconAcademyObj->transform.setPosition(20.5f, -0.2f, 70.0f);
+    beaconAcademyObj->transform.setRotation(-90.0f, 0.0f, -90.0f);
+    beaconAcademyObj->transform.setScale(0.01f);
 
-	Malon malon;
-	if (!malon.Initialize(matOpaco, matBrillante)) return -1;
+    // Opera Sinner's Finale
+    Model sinnersFinale; if (!sinnersFinale.load("Models/Opera.obj")) return -1;
+    std::shared_ptr<GameObject> sinnersFinaleObj = std::make_shared<GameObject>("SinnersFinale");
+    sinnersFinaleObj->setModel(&sinnersFinale);
+    sinnersFinaleObj->setMaterial(&matBrillante);
+    sinnersFinaleObj->transform.setPosition(90.0f, 0.8f, 45.0f);
+    sinnersFinaleObj->transform.setScale(0.2f);
 
-	Castle castle; 
-	if (!castle.Initialize(matOpaco, pointLights, pointLightCount)) return -1;
+    Malon malon;
+    if (!malon.Initialize(matOpaco, matBrillante)) return -1;
+
+    Castle castle;
+    if (!castle.Initialize(matOpaco, pointLights, pointLightCount)) return -1;
     castle.GetCastleObject()->transform.setScale(2.0f, 2.0f, 2.0f);
-	castle.GetCastleObject()->transform.setPosition(-20.0f, -1.0f, 0.0f);
+    castle.GetCastleObject()->transform.setPosition(-20.0f, -1.0f, 0.0f);
 
-	Train train;
+    Train train;
     if (!train.Initialize(matOpaco)) return -1;
 
     float trainSpeed = 5.0f;
@@ -225,10 +243,14 @@ int main()
     // Nave Keyframes
     Nave nave;
     if (!nave.Initialize(matOpaco)) return -1;
-	nave.GetNaveObject()->transform.setScale(3.0f);
-	nave.GetNaveObject()->transform.setPosition(20.0f, 10.0f, 70.0f);
+    nave.GetNaveObject()->transform.setScale(3.0f);
+    nave.GetNaveObject()->transform.setPosition(20.0f, 10.0f, 70.0f);
     nave.SetKeyframesIniciales();
     nave.DisplayMenu();
+
+    // Árboles
+    Tree tree;
+    if (!tree.Initialize(matOpaco)) return -1;
 
     // Avatar: Ruby
 
@@ -257,28 +279,28 @@ int main()
         0.0f, -1.0f, -0.5f
     );
 
-    // Punto de Interés 1: Torre Grande Central
-    // Enfoca una de las torres principales del castillo desde una vista dinámica
-    glm::vec3 bigTower1Pos(16.84f, 8.92f, -9.0f);
+    // Punto de Interés 1: Deku Tree
+    // Vista frontal ligeramente elevada del Gran Árbol Deku
+    glm::vec3 dekuTreePos(-12.9f, 0.0f, 12.9f);
     camera.addInterestPoint(
-        bigTower1Pos + glm::vec3(15.0f, 8.0f, 15.0f),
-        bigTower1Pos + glm::vec3(0.0f, 5.0f, 0.0f)
+        dekuTreePos + glm::vec3(14.0f, 12.0f, 14.0f), // cámara: más alejada y elevada
+        dekuTreePos + glm::vec3(0.0f, 6.0f, 0.0f)     // mira a la copa del árbol
     );
 
-    // Punto de Interés 2: Entrada del Castillo (Vista General)
-    // Muestra la entrada y la estructura general del castillo
-    glm::vec3 castleEntrancePos(20.0f, 5.0f, -8.0f);
+    // Punto de Interés 2: Ópera Sinner's Finale
+    // Vista general de la fachada de la Ópera
+    glm::vec3 operaPos(90.0f, 0.8f, 45.0f);
     camera.addInterestPoint(
-        castleEntrancePos + glm::vec3(-20.0f, 12.0f, 25.0f),
-        castleEntrancePos
+        operaPos + glm::vec3(-18.0f, 14.0f, 18.0f),  // cámara: diagonal frontal más elevada
+        operaPos + glm::vec3(0.0f, 5.0f, 0.0f)       // mira al centro de la fachada
     );
 
-    // Punto de Interés 3: Torres de Defensa Laterales
-    // Enfoca las torres medias de las esquinas del castillo
-    glm::vec3 lateralTowerPos(36.09f, 5.44f, -3.64f);
+    // Punto de Interés 3: Beacon Academy
+    // Vista que muestra la escala monumental del edificio
+    glm::vec3 beaconPos(20.5f, -0.2f, 70.0f);
     camera.addInterestPoint(
-        lateralTowerPos + glm::vec3(18.0f, 10.0f, 18.0f),
-        lateralTowerPos + glm::vec3(0.0f, 8.0f, 0.0f)
+        beaconPos + glm::vec3(20.0f, 16.0f, -20.0f), // cámara: frente más elevada
+        beaconPos + glm::vec3(0.0f, 8.0f, 0.0f)      // mira a la parte central del edificio
     );
 
     // Proyección
@@ -288,8 +310,21 @@ int main()
     glm::mat4 model(1.0f);
     GLfloat lastTime = (GLfloat)glfwGetTime();
 
-	// Estado de las antorchas
+    // Estado de las antorchas
     bool torchesOn = true;
+
+    // Estado de audio de Malon
+    bool malonAudioActive = false;
+    float MALON_PROXIMITY_RANGE = 15.0f;
+    float FADE_DURATION = 1.75f;
+
+    // Estado de audio de Opera
+    bool operaAudioActive = false;
+    float OPERA_PROXIMITY_RANGE = 20.0f;
+
+    // Estado de audio del Tren
+    bool trainAudioActive = false;
+    float TRAIN_PROXIMITY_RANGE = 10.0f;
 
     // Bucle principal
     while (!mainWindow.shouldClose())
@@ -310,7 +345,7 @@ int main()
         // Toggle para apagar o encender las luces del castillo
         if (input.isKeyPressed(GLFW_KEY_T))
         {
-            torchesOn = !torchesOn; 
+            torchesOn = !torchesOn;
 
             GLfloat targetAmbient = torchesOn ? 0.2f : 0.0f;
             GLfloat targetDiffuse = torchesOn ? 1.0f : 0.0f;
@@ -399,6 +434,80 @@ int main()
         malon.Update(deltaTime);
         nave.Update(deltaTime);
 
+        // Verificar proximidad a Malon
+        glm::vec3 malonPos = malon.GetPosition();
+        float distanceToMalon = glm::distance(rubyPos, malonPos);
+        bool shouldPlayMalonSound = distanceToMalon < MALON_PROXIMITY_RANGE;
+
+        // Gestionar audio de Malon
+        if (shouldPlayMalonSound && !malonAudioActive)
+        {
+            // Entrar en rango: fade out de música y fade in de sonido de Malon
+            audioManager.fadeOut("bgMusic", FADE_DURATION);
+            audioManager.fadeIn("malonSound", FADE_DURATION, true);
+            malonAudioActive = true;
+        }
+        else if (!shouldPlayMalonSound && malonAudioActive)
+        {
+            // Salir de rango: fade out de sonido de Malon y reanudar música
+            audioManager.fadeOut("malonSound", FADE_DURATION);
+            audioManager.fadeIn("bgMusic", FADE_DURATION, true, true);
+            malonAudioActive = false;
+        }
+
+        // Actualizar posición 3D del sonido de Malon
+        audioManager.setSourcePosition("malonSound", malonPos);
+
+        // Verificar proximidad a Opera Sinner's Finale
+        glm::vec3 operaPos = sinnersFinaleObj->transform.getPosition();
+        float distanceToOpera = glm::distance(rubyPos, operaPos);
+        bool shouldPlayOperaSound = distanceToOpera < OPERA_PROXIMITY_RANGE;
+
+        // Gestionar audio de Opera
+        if (shouldPlayOperaSound && !operaAudioActive)
+        {
+            // Entrar en rango: fade out de música y fade in de sonido de Opera
+            audioManager.fadeOut("bgMusic", FADE_DURATION);
+            audioManager.fadeIn("operaSound", FADE_DURATION, true, true);
+            operaAudioActive = true;
+        }
+        else if (!shouldPlayOperaSound && operaAudioActive)
+        {
+            // Salir de rango: fade out de sonido de Opera y reanudar música
+            audioManager.fadeOut("operaSound", FADE_DURATION);
+            audioManager.fadeIn("bgMusic", FADE_DURATION, true, true);
+            operaAudioActive = false;
+        }
+
+        // Actualizar posición 3D del sonido de Opera
+        audioManager.setSourcePosition("operaSound", operaPos);
+
+        // Verificar proximidad al Tren
+        glm::vec3 trainPos = train.GetPosition();
+        float distanceToTrain = glm::distance(rubyPos, trainPos);
+        bool shouldPlayTrainSound = distanceToTrain < TRAIN_PROXIMITY_RANGE;
+
+        // Gestionar audio del Tren (no interrumpe la música, solo se superpone)
+        if (shouldPlayTrainSound && !trainAudioActive)
+        {
+            audioManager.fadeIn("trainSound", FADE_DURATION, true, true);
+            trainAudioActive = true;
+        }
+        else if (!shouldPlayTrainSound && trainAudioActive)
+        {
+            audioManager.fadeOut("trainSound", FADE_DURATION);
+            trainAudioActive = false;
+        }
+
+        // Actualizar posición 3D del sonido del Tren
+        audioManager.setSourcePosition("trainSound", trainPos);
+
+        // Actualizar posición del listener (cámara)
+        audioManager.setListenerPosition(camera.getPosition(), camera.getDirection(), glm::vec3(0.0f, 1.0f, 0.0f));
+
+        // Actualizar sistema de audio (fade in/out)
+        audioManager.update(deltaTime);
+
         // Movimiento de Ruby — solo en modo THIRD_PERSON y sin transición activa
         float rubyMoveSpeed = 8.0f;
         glm::vec3 cameraDirection = camera.getDirection();
@@ -463,7 +572,7 @@ int main()
 
         // Luces
 
-        // Luz direccional
+        // Luz direccional — ciclo día/noche con movimiento solar
         float timeProgress = skybox.getTimeProgress();
         float dayIntensity, nightIntensity;
 
@@ -489,6 +598,16 @@ int main()
         directionalLight.setColor(currentColor);
         directionalLight.setAmbientIntensity(0.3f * (0.5f + dayIntensity * 0.5f));
         directionalLight.setDiffuseIntensity(0.8f * dayIntensity);
+
+        // Rotación solar
+        {
+            float sunAngle = timeProgress * glm::two_pi<float>(); // 0..2π
+            // El sol gira en el plano XY: de Este (+X) sube hacia el cenit (-Y) y cae hacia Oeste (-X)
+            float sunX = glm::cos(sunAngle);          //  1 al amanecer, -1 al atardecer
+            float sunY = -glm::sin(sunAngle);         // -1 al mediodía (apunta hacia abajo)
+            float sunZ = -0.3f;                       // leve inclinación Norte-Sur constante
+            directionalLight.setDirection(sunX, sunY, sunZ);
+        }
 
         // Renderizado
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -521,21 +640,30 @@ int main()
         train.GetTrainObject()->draw(shader);
 
         // Nave
-		nave.GetNaveObject()->draw(shader);
+        nave.GetNaveObject()->draw(shader);
 
-		// Deku Tree
-		dekuTreeObj->draw(shader);
+        // Deku Tree
+        dekuTreeObj->draw(shader);
 
-		// Malon y Nimbus 2000
-		malon.GetMalonObject()->draw(shader);
+        // Malon y Nimbus 2000
+        malon.GetMalonObject()->draw(shader);
 
-		// Columbina
-		columbinaObj->draw(shader); 
+        // Columbina
+        columbinaObj->draw(shader);
 
-		// Beacon Academy
-		beaconAcademyObj->draw(shader);
+        // Beacon Academy
+        beaconAcademyObj->draw(shader);
 
-		// Ruby
+        // Opera Sinner's Finale
+        sinnersFinaleObj->draw(shader);
+
+        // Árboles
+        for (const auto& treeObj : tree.GetTreeObjects())
+        {
+            treeObj->draw(shader);
+        }
+
+        // Ruby
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         rubyObj->draw(shader);

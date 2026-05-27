@@ -2,6 +2,7 @@
 #define DR_WAV_IMPLEMENTATION
 
 #include <cstdio>
+#include <glm.hpp>
 
 #include "dr_wav.h"
 #include "dr_mp3.h"
@@ -170,6 +171,97 @@ bool AudioManager::isPlaying(const std::string& name) const
     ALint state;
     alGetSourcei(it->second.source, AL_SOURCE_STATE, &state);
     return state == AL_PLAYING;
+}
+
+// Fade in/out
+void AudioManager::fadeIn(const std::string& name, float duration, bool loop, bool resume)
+{
+    auto it = clips.find(name);
+    if (it == clips.end())
+    {
+        printf("[Audio] Error: '%s' no esta cargado.\n", name.c_str());
+        return;
+    }
+
+    // Si no es resume, iniciar desde el principio
+    if (!resume)
+    {
+        alSourceRewind(it->second.source);
+        alSourcei(it->second.source, AL_LOOPING, loop ? AL_TRUE : AL_FALSE);
+        alSourcef(it->second.source, AL_GAIN, 0.0f);
+        alSourcePlay(it->second.source);
+    }
+    else
+    {
+        // Si es resume, reanudar desde donde estaba pausado
+        alSourcei(it->second.source, AL_LOOPING, loop ? AL_TRUE : AL_FALSE);
+        alSourcef(it->second.source, AL_GAIN, 0.0f);
+        alSourcePlay(it->second.source);
+    }
+
+    // Configurar fade
+    fadeStates[name] = { FadeState::FADING_IN, 0.0f, duration, loop };
+}
+
+void AudioManager::fadeOut(const std::string& name, float duration)
+{
+    auto it = clips.find(name);
+    if (it == clips.end())
+    {
+        printf("[Audio] Error: '%s' no esta cargado.\n", name.c_str());
+        return;
+    }
+
+    if (!isPlaying(name))
+        return;
+
+    // Configurar fade
+    fadeStates[name] = { FadeState::FADING_OUT, 0.0f, duration, false };
+}
+
+void AudioManager::update(float deltaTime)
+{
+    for (auto it = fadeStates.begin(); it != fadeStates.end(); )
+    {
+        const std::string& name = it->first;
+        FadeInfo& fadeInfo = it->second;
+
+        if (fadeInfo.state == FadeState::NONE)
+        {
+            ++it;
+            continue;
+        }
+
+        fadeInfo.currentTime += deltaTime;
+        float progress = glm::clamp(fadeInfo.currentTime / fadeInfo.duration, 0.0f, 1.0f);
+
+        auto clipIt = clips.find(name);
+        if (clipIt != clips.end())
+        {
+            if (fadeInfo.state == FadeState::FADING_IN)
+            {
+                alSourcef(clipIt->second.source, AL_GAIN, progress);
+
+                if (progress >= 1.0f)
+                {
+                    fadeInfo.state = FadeState::NONE;
+                }
+            }
+            else if (fadeInfo.state == FadeState::FADING_OUT)
+            {
+                float currentGain = 1.0f - progress;
+                alSourcef(clipIt->second.source, AL_GAIN, currentGain);
+
+                if (progress >= 1.0f)
+                {
+                    alSourcePause(clipIt->second.source);
+                    fadeInfo.state = FadeState::NONE;
+                }
+            }
+        }
+
+        ++it;
+    }
 }
 
 // Audio 3D

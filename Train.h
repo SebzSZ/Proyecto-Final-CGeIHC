@@ -15,6 +15,7 @@ public:
 	bool Initialize(Material& matOpaco);
 	std::shared_ptr<GameObject> GetTrainObject() const { return trainObj; }
 	void Update(float trainSpeed, float deltaTime, float wheelRotationSpeed);
+	glm::vec3 GetPosition() const { return engineCar->transform.getPosition(); }
 
 private:
 	static constexpr float TRACK_STRAIGHT_LEN = 45.0f;

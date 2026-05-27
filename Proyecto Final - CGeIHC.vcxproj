@@ -153,6 +153,7 @@
     <ClCompile Include="Train.cpp" />
     <ClCompile Include="Train.h" />
     <ClCompile Include="Transform.cpp" />
+    <ClCompile Include="Tree.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -178,6 +179,7 @@
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Transform.h" />
+    <ClInclude Include="Tree.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>
