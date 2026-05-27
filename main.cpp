@@ -51,6 +51,9 @@ static GLuint FLOOR_IDX[] = { 0, 1, 2,  0, 2, 3 };
 unsigned int pointLightCount = 0;
 PointLight pointLights[MAX_POINT_LIGHTS];
 
+unsigned int spotLightCount = 0;
+SpotLight spotLights[MAX_SPOT_LIGHTS];
+
 // CreateAvatar
 // Construir la jerarquía del avatar (Ruby)
 std::shared_ptr<GameObject> CreateAvatar(
@@ -101,6 +104,83 @@ std::shared_ptr<GameObject> CreateAvatar(
     rubyObj->addChild(cape);
 
     return rubyObj;
+}
+
+void AddStreetLampSpot(GLfloat x, GLfloat z)
+{
+    if (spotLightCount >= MAX_SPOT_LIGHTS) return;
+
+    spotLights[spotLightCount++] = SpotLight(
+        1.0f, 0.95f, 0.8f,
+        0.0f, 2.0f,
+        x, 7.0f, z,
+        0.0f, -1.0f, 0.0f,
+        1.0f, 0.045f, 0.0075f,
+        35.0f
+    );
+}
+
+std::shared_ptr<GameObject> CreateStreetLamps(Model& streetLampModel, Material& matOpaco)
+{
+	std::shared_ptr<GameObject> container = std::make_shared<GameObject>("Container", GameObjectType::MODEL);  
+
+	spotLightCount = 0;
+
+	std::shared_ptr<GameObject> lamp1 = std::make_shared<GameObject>("Lamp 1", GameObjectType::MODEL);
+	lamp1->setModel(&streetLampModel);
+	lamp1->setMaterial(&matOpaco);
+	lamp1->transform.setPosition(14.0f, 0.0f, 88.0f);
+	lamp1->transform.setRotation(0.0f, 180.0f, -90.0f);
+	lamp1->transform.setScale(2.0f);
+	container->addChild(lamp1);
+	AddStreetLampSpot(14.0f, 88.0f);
+
+	std::shared_ptr<GameObject> lamp2 = std::make_shared<GameObject>("Lamp 2", GameObjectType::MODEL);
+	lamp2->setModel(&streetLampModel);
+	lamp2->setMaterial(&matOpaco);
+	lamp2->transform.setPosition(14.0f, 0.0f, 68.0f);
+	lamp2->transform.setRotation(0.0f, 180.0f, -90.0f);
+	lamp2->transform.setScale(2.0f);
+	container->addChild(lamp2);
+	AddStreetLampSpot(14.0f, 68.0f);
+
+	std::shared_ptr<GameObject> lamp3 = std::make_shared<GameObject>("Lamp 3", GameObjectType::MODEL);
+	lamp3->setModel(&streetLampModel);
+	lamp3->setMaterial(&matOpaco);
+	lamp3->transform.setPosition(14.0f, 0.0f, 48.0f);
+	lamp3->transform.setRotation(0.0f, 180.0f, -90.0f);
+	lamp3->transform.setScale(2.0f);
+	container->addChild(lamp3);
+	AddStreetLampSpot(14.0f, 48.0f);
+
+	std::shared_ptr<GameObject> lamp4 = std::make_shared<GameObject>("Lamp 4", GameObjectType::MODEL);
+	lamp4->setModel(&streetLampModel);
+	lamp4->setMaterial(&matOpaco);
+	lamp4->transform.setPosition(27.0f, 0.0f, 88.0f);
+	lamp4->transform.setRotation(0.0f, 0.0f, -90.0f);
+	lamp4->transform.setScale(2.0f);
+	container->addChild(lamp4);
+	AddStreetLampSpot(27.0f, 88.0f);
+
+	std::shared_ptr<GameObject> lamp5 = std::make_shared<GameObject>("Lamp 5", GameObjectType::MODEL);
+	lamp5->setModel(&streetLampModel);
+	lamp5->setMaterial(&matOpaco);
+	lamp5->transform.setPosition(27.0f, 0.0f, 68.0f);
+	lamp5->transform.setRotation(0.0f, 0.0f, -90.0f);
+	lamp5->transform.setScale(2.0f);
+	container->addChild(lamp5);
+	AddStreetLampSpot(27.0f, 68.0f);
+
+	std::shared_ptr<GameObject> lamp6 = std::make_shared<GameObject>("Lamp 6", GameObjectType::MODEL);
+	lamp6->setModel(&streetLampModel);
+	lamp6->setMaterial(&matOpaco);
+	lamp6->transform.setPosition(27.0f, 0.0f, 48.0f);
+	lamp6->transform.setRotation(0.0f, 0.0f, -90.0f);
+	lamp6->transform.setScale(2.0f);
+	container->addChild(lamp6);
+	AddStreetLampSpot(27.0f, 48.0f);
+
+	return container;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -209,6 +289,10 @@ int main()
 	beaconAcademyObj->transform.setRotation(-90.0f, 0.0f, -90.0f);
 	beaconAcademyObj->transform.setScale(0.01f);
 
+	// Street Lamps
+	Model streetLampModel; if (!streetLampModel.load("Models/StreetLamp.obj")) return -1;
+	std::shared_ptr<GameObject> streetLampsContainer = CreateStreetLamps(streetLampModel, matOpaco);
+
 	Malon malon;
 	if (!malon.Initialize(matOpaco, matBrillante)) return -1;
 
@@ -290,40 +374,58 @@ int main()
     GLfloat lastTime = (GLfloat)glfwGetTime();
 
 	// Estado de las antorchas
-    bool torchesOn = true;
+	bool torchesOn = true;
 
-    // Bucle principal
-    while (!mainWindow.shouldClose())
-    {
-        // Delta Time
-        GLfloat now = (GLfloat)glfwGetTime();
-        GLfloat deltaTime = now - lastTime;
-        lastTime = now;
+	// Estado de los spotlights de postes
+	bool streetSpotsOn = true;
 
-        // Actualizar ciclo día-noche del skybox
-        skybox.updateDayNightCycle(deltaTime);
+	// Bucle principal
+	while (!mainWindow.shouldClose())
+	{
+		// Delta Time
+		GLfloat now = (GLfloat)glfwGetTime();
+		GLfloat deltaTime = now - lastTime;
+		lastTime = now;
 
-        // Input
-        InputManager& input = InputManager::getInstance();
-        input.beginFrame();
-        glfwPollEvents();
+		// Actualizar ciclo día-noche del skybox
+		skybox.updateDayNightCycle(deltaTime);
 
-        // Toggle para apagar o encender las luces del castillo
-        if (input.isKeyPressed(GLFW_KEY_T))
-        {
-            torchesOn = !torchesOn; 
+		// Input
+		InputManager& input = InputManager::getInstance();
+		input.beginFrame();
+		glfwPollEvents();
 
-            GLfloat targetAmbient = torchesOn ? 0.2f : 0.0f;
-            GLfloat targetDiffuse = torchesOn ? 1.0f : 0.0f;
+		// Toggle para apagar o encender las luces del castillo
+		if (input.isKeyPressed(GLFW_KEY_T))
+		{
+			torchesOn = !torchesOn; 
 
-            for (unsigned int i = 0; i < pointLightCount; i++)
-            {
-                pointLights[i].setAmbientIntensity(targetAmbient);
-                pointLights[i].setDiffuseIntensity(targetDiffuse);
-            }
-        }
+			GLfloat targetAmbient = torchesOn ? 0.2f : 0.0f;
+			GLfloat targetDiffuse = torchesOn ? 1.0f : 0.0f;
 
-        // Cambio de modo de cámara (C, V, B)
+			for (unsigned int i = 0; i < pointLightCount; i++)
+			{
+				pointLights[i].setAmbientIntensity(targetAmbient);
+				pointLights[i].setDiffuseIntensity(targetDiffuse);
+			}
+		}
+
+		// Toggle para apagar o encender los spotlights de los postes
+		if (input.isKeyPressed(GLFW_KEY_L))
+		{
+			streetSpotsOn = !streetSpotsOn;
+
+			GLfloat targetAmbient = streetSpotsOn ? 0.0f : 0.0f;
+			GLfloat targetDiffuse = streetSpotsOn ? 2.0f : 0.0f;
+
+			for (unsigned int i = 0; i < spotLightCount; i++)
+			{
+				spotLights[i].setAmbientIntensity(targetAmbient);
+				spotLights[i].setDiffuseIntensity(targetDiffuse);
+			}
+		}
+
+		// Cambio de modo de cámara (C, V, B)
         if (input.isKeyDown(GLFW_KEY_C))
         {
             camera.setCameraMode(CameraMode::THIRD_PERSON);
@@ -511,6 +613,7 @@ int main()
 
         shader.setDirectionalLight(&directionalLight);
         shader.setPointLights(pointLights, pointLightCount);
+        shader.setSpotLights(spotLights, spotLightCount);
 
         // Piso
         floorObj->draw(shader);
@@ -535,6 +638,9 @@ int main()
 
 		// Beacon Academy
 		beaconAcademyObj->draw(shader);
+
+        // Street Lamps
+		streetLampsContainer->draw(shader);
 
 		// Ruby
         glEnable(GL_BLEND);
