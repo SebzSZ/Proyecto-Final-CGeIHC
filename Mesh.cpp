@@ -8,21 +8,34 @@ Mesh::Mesh()
 
 void Mesh::create(GLfloat* vertices, GLuint* indices, GLuint vertexCount, GLuint indexCount)
 {
+	if (!vertices || !indices || vertexCount == 0 || indexCount == 0)
+	{
+		this->indexCount = 0;
+		return;
+	}
+
 	this->indexCount = static_cast<GLsizei>(indexCount);
 
 	glGenVertexArrays(1, &VAO);
+	glGenBuffers(1, &EBO);
+	glGenBuffers(1, &VBO);
+
+	if (VAO == 0 || EBO == 0 || VBO == 0)
+	{
+		clear();
+		return;
+	}
+
 	glBindVertexArray(VAO);
 
-	glGenBuffers(1, &EBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount * sizeof(GLuint), indices, GL_STATIC_DRAW);
-	
-	glGenBuffers(1, &VBO);
+
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, vertexCount * sizeof(GLfloat), vertices, GL_STATIC_DRAW);
 
 	constexpr GLsizei stride = 8 * sizeof(GLfloat);
-	
+
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(GLfloat)));
@@ -91,6 +104,9 @@ void Mesh::calcAverageNormals(GLuint* indices, GLuint indexCount, GLfloat* verti
 
 void Mesh::render() const
 {
+	if (VAO == 0 || EBO == 0 || indexCount <= 0)
+		return;
+
 	glBindVertexArray(VAO);
 	glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);

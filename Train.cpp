@@ -3,7 +3,7 @@
 #include <cmath>
 #include <string>
 
-const glm::vec3 Train::TRACK_CENTER = glm::vec3(0.0f, 0.0f, 20.0f);
+const glm::vec3 Train::TRACK_CENTER = glm::vec3(22.2f, 0.0f, 65.0f);
 
 Train::Train() : distanceTraveled(0.0f) {}
 

@@ -19,6 +19,7 @@
 #include "Material.h"
 #include "Mesh.h"
 #include "Model.h"
+#include "PointLight.h"
 #include "Shader.h"
 #include "Skybox.h"
 #include "SpotLight.h"
@@ -27,6 +28,8 @@
 #include "GameObject.h"
 #include "Train.h"
 #include "Castle.h"
+#include "Malon.h"
+#include "Nave.h"
 
 // Rutas de shaders
 static const char* VERT_SHADER = "shaders/shader.vert";
@@ -43,6 +46,10 @@ static GLfloat FLOOR_VERTS[] = {
        -1.0f,  0.0f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f, 0.0f,
 };
 static GLuint FLOOR_IDX[] = { 0, 1, 2,  0, 2, 3 };
+
+// Luces
+unsigned int pointLightCount = 0;
+PointLight pointLights[MAX_POINT_LIGHTS];
 
 // CreateAvatar
 // Construir la jerarquía del avatar (Ruby)
@@ -109,7 +116,7 @@ int main()
 
     // Reproducir música
     audioManager.loadMP3("bgMusic", "Sounds/bgMusic.mp3");
-    audioManager.play("bgMusic", true, 0.5f);
+    //audioManager.play("bgMusic", true, 0.5f);
 
     // Configuración inicial de la cámara
     Camera camera(glm::vec3(0.0f, 5.0f, 5.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, 0.0f, 5.0f, 0.1f);
@@ -119,34 +126,32 @@ int main()
     Shader shader;
     shader.createFromFiles(VERT_SHADER, FRAG_SHADER);
 
-	// Creación del skybox con texturas de día y noche (ambas con Space)
-	Skybox skybox;
-	skybox.create(
-		// Texturas de día (Space Nebula Blue)
-		// Orden: RIGHT, LEFT, UP, DOWN, FRONT, BACK
-		{
-			"Textures/Skybox/jettelly_space_nebulas_blue_LEFT.png",
-			"Textures/Skybox/jettelly_space_nebulas_blue_RIGHT.png",
-			"Textures/Skybox/jettelly_space_nebulas_blue_UP.png",
-			"Textures/Skybox/jettelly_space_nebulas_blue_DOWN.png",
-			"Textures/Skybox/jettelly_space_nebulas_blue_FRONT.png",
-			"Textures/Skybox/jettelly_space_nebulas_blue_BACK.png"
-		},
-		// Texturas de noche (Space Nebula Blue)
-		// Orden: RIGHT, LEFT, UP, DOWN, FRONT, BACK
-		{
-			"Textures/Skybox/jettelly_space_nebulas_black_LEFT.png",
-			"Textures/Skybox/jettelly_space_nebulas_black_RIGHT.png",
-			"Textures/Skybox/jettelly_space_nebulas_black_UP.png",
-			"Textures/Skybox/jettelly_space_nebulas_black_DOWN.png",
-			"Textures/Skybox/jettelly_space_nebulas_black_FRONT.png",
-			"Textures/Skybox/jettelly_space_nebulas_black_BACK.png"
-		},
-		SKYBOX_VERT, SKYBOX_FRAG
-	);
+    // Creación del skybox con texturas de día y noche (ambas con Space)
+    Skybox skybox;
+    skybox.create(
+        // Texturas de día (Space Nebula Blue)
+        {
+            "Textures/Skybox/jettelly_space_nebulas_blue_LEFT.png",
+            "Textures/Skybox/jettelly_space_nebulas_blue_RIGHT.png",
+            "Textures/Skybox/jettelly_space_nebulas_blue_UP.png",
+            "Textures/Skybox/jettelly_space_nebulas_blue_DOWN.png",
+            "Textures/Skybox/jettelly_space_nebulas_blue_FRONT.png",
+            "Textures/Skybox/jettelly_space_nebulas_blue_BACK.png"
+        },
+        // Texturas de noche (Space Nebula Blue)
+        {
+            "Textures/Skybox/jettelly_space_nebulas_black_LEFT.png",
+            "Textures/Skybox/jettelly_space_nebulas_black_RIGHT.png",
+            "Textures/Skybox/jettelly_space_nebulas_black_UP.png",
+            "Textures/Skybox/jettelly_space_nebulas_black_DOWN.png",
+            "Textures/Skybox/jettelly_space_nebulas_black_FRONT.png",
+            "Textures/Skybox/jettelly_space_nebulas_black_BACK.png"
+        },
+        SKYBOX_VERT, SKYBOX_FRAG
+    );
 
-	// Configurar duración del ciclo día-noche (30 segundos para el ciclo completo)
-	skybox.setDayNightCycleDuration(30.0f);
+    // Configurar duración del ciclo día-noche (30 segundos para el ciclo completo)
+    skybox.setDayNightCycleDuration(30.0f);
 
     // Texturas y materiales
     Texture floorTexture("Textures/naka_yuka_01_52D00-DXT1.png");
@@ -164,13 +169,6 @@ int main()
     Model rubyRightLeg; if (!rubyRightLeg.load("Models/RubyPiernaDer.obj")) return -1;
     Model rubyCape;     if (!rubyCape.load("Models/RubyCapa.obj"))         return -1;
 
-    // Castillo de Hyrule — partes del escenario
-    Model mainRoom;  if (!mainRoom.load("Models/HyruleCastle_MainRoom.obj")) return -1;
-    Model bigTower;  if (!bigTower.load("Models/HyruleCastle_BigTower.obj")) return -1;
-    Model wall;      if (!wall.load("Models/HyruleCastle_Wall.obj"))         return -1;
-    Model midTower;  if (!midTower.load("Models/HyruleCastle_MidTower.obj")) return -1;
-    Model floor;     if (!floor.load("Models/HyruleCastle_Floor.obj"))       return -1;
-
     // GameObjects de la escena
 
     // Piso de la escena
@@ -180,16 +178,57 @@ int main()
     floorObj->setMesh(floorMesh);
     floorObj->setTextureID(floorTexture.getID());
     floorObj->setMaterial(&matOpaco);
-    floorObj->transform.setScale(50.0f, 1.0f, 50.0f);
+    floorObj->transform.setScale(100.0f, 1.0f, 100.0f);
+	floorObj->transform.setPosition(20.0f, 0.0f, 0.0f);
+    
+    // Deku Tree
+	Model dekuTreeModel; if (!dekuTreeModel.load("Models/DekuTree.obj")) return -1;
+	std::shared_ptr<GameObject> dekuTreeObj = std::make_shared<GameObject>("DekuTree", GameObjectType::MODEL);
+    dekuTreeObj->setModel(&dekuTreeModel);
+	dekuTreeObj->setMaterial(&matOpaco);
+    dekuTreeObj->transform.setPosition(-12.9f, 0.0f, 12.9f);
+	dekuTreeObj->transform.setRotation(0.0f, 65.6f, 0.0f);
+	dekuTreeObj->transform.setScale(0.03f);
 
-    Castle castle;
-    if (!castle.Initialize(matOpaco)) return -1;
+	// Columbina
+	Model columbina; if (!columbina.load("Models/Columbina.obj")) return -1;
+	std::shared_ptr<GameObject> columbinaObj = std::make_shared<GameObject>("Columbina", GameObjectType::MODEL);
+	columbinaObj->setModel(&columbina);    
+	columbinaObj->setMaterial(&matOpaco);
+	columbinaObj->transform.setPosition(7.13f, 0.122f, 10.18f);
+	columbinaObj->transform.setRotation(0.0f, 60.0f, 0.0f);
+    columbinaObj->transform.setScale(0.5f);
 
-    Train train;
+    // Beacon Academy
+	Model beaconAcademy; if (!beaconAcademy.load("Models/Beacon.obj")) return -1;
+	std::shared_ptr<GameObject> beaconAcademyObj = std::make_shared<GameObject>("BeaconAcademy", GameObjectType::MODEL);
+	beaconAcademyObj->setModel(&beaconAcademy);
+	beaconAcademyObj->setMaterial(&matOpaco);
+	beaconAcademyObj->transform.setPosition(20.5f, -0.2f, 70.0f);
+	beaconAcademyObj->transform.setRotation(-90.0f, 0.0f, -90.0f);
+	beaconAcademyObj->transform.setScale(0.01f);
+
+	Malon malon;
+	if (!malon.Initialize(matOpaco, matBrillante)) return -1;
+
+	Castle castle; 
+	if (!castle.Initialize(matOpaco, pointLights, pointLightCount)) return -1;
+    castle.GetCastleObject()->transform.setScale(2.0f, 2.0f, 2.0f);
+	castle.GetCastleObject()->transform.setPosition(-20.0f, -1.0f, 0.0f);
+
+	Train train;
     if (!train.Initialize(matOpaco)) return -1;
 
     float trainSpeed = 5.0f;
     float wheelRotationSpeed = 200.0f;
+
+    // Nave Keyframes
+    Nave nave;
+    if (!nave.Initialize(matOpaco)) return -1;
+	nave.GetNaveObject()->transform.setScale(3.0f);
+	nave.GetNaveObject()->transform.setPosition(20.0f, 10.0f, 70.0f);
+    nave.SetKeyframesIniciales();
+    nave.DisplayMenu();
 
     // Avatar: Ruby
 
@@ -223,7 +262,7 @@ int main()
     glm::vec3 bigTower1Pos(16.84f, 8.92f, -9.0f);
     camera.addInterestPoint(
         bigTower1Pos + glm::vec3(15.0f, 8.0f, 15.0f),
-        bigTower1Pos + glm::vec3(0.0f, 5.0f, 0.0f) 
+        bigTower1Pos + glm::vec3(0.0f, 5.0f, 0.0f)
     );
 
     // Punto de Interés 2: Entrada del Castillo (Vista General)
@@ -249,6 +288,9 @@ int main()
     glm::mat4 model(1.0f);
     GLfloat lastTime = (GLfloat)glfwGetTime();
 
+	// Estado de las antorchas
+    bool torchesOn = true;
+
     // Bucle principal
     while (!mainWindow.shouldClose())
     {
@@ -261,9 +303,24 @@ int main()
         skybox.updateDayNightCycle(deltaTime);
 
         // Input
-        glfwPollEvents();
         InputManager& input = InputManager::getInstance();
         input.beginFrame();
+        glfwPollEvents();
+
+        // Toggle para apagar o encender las luces del castillo
+        if (input.isKeyPressed(GLFW_KEY_T))
+        {
+            torchesOn = !torchesOn; 
+
+            GLfloat targetAmbient = torchesOn ? 0.2f : 0.0f;
+            GLfloat targetDiffuse = torchesOn ? 1.0f : 0.0f;
+
+            for (unsigned int i = 0; i < pointLightCount; i++)
+            {
+                pointLights[i].setAmbientIntensity(targetAmbient);
+                pointLights[i].setDiffuseIntensity(targetDiffuse);
+            }
+        }
 
         // Cambio de modo de cámara (C, V, B)
         if (input.isKeyDown(GLFW_KEY_C))
@@ -338,8 +395,9 @@ int main()
         }
         }
 
-        // Movimiento del tren
         train.Update(trainSpeed, deltaTime, wheelRotationSpeed);
+        malon.Update(deltaTime);
+        nave.Update(deltaTime);
 
         // Movimiento de Ruby — solo en modo THIRD_PERSON y sin transición activa
         float rubyMoveSpeed = 8.0f;
@@ -451,21 +509,33 @@ int main()
         glUniform2f(shader.getTextureOffsetLocation(), 0.0f, 0.0f);
 
         shader.setDirectionalLight(&directionalLight);
+        shader.setPointLights(pointLights, pointLightCount);
 
-		// Renderizar objetos
-		floorObj->draw(shader);
-
-		
-        // Objetos de la escena
+        // Piso
         floorObj->draw(shader);
-        
-        // Render del castillo
+
+        // Hyrule Castle
         castle.GetCastleObject()->draw(shader);
 
-        // Render del tren
+        // Tren
         train.GetTrainObject()->draw(shader);
 
-        // Ruby
+        // Nave
+		nave.GetNaveObject()->draw(shader);
+
+		// Deku Tree
+		dekuTreeObj->draw(shader);
+
+		// Malon y Nimbus 2000
+		malon.GetMalonObject()->draw(shader);
+
+		// Columbina
+		columbinaObj->draw(shader); 
+
+		// Beacon Academy
+		beaconAcademyObj->draw(shader);
+
+		// Ruby
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         rubyObj->draw(shader);

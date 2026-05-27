@@ -17,7 +17,7 @@ public:
 	void Update(float trainSpeed, float deltaTime, float wheelRotationSpeed);
 
 private:
-	static constexpr float TRACK_STRAIGHT_LEN = 18.0f;
+	static constexpr float TRACK_STRAIGHT_LEN = 45.0f;
 	static constexpr float TRACK_CURVE_RADIUS = 6.0f;
 	static constexpr float WAGON_SPACING = 2.4f;
 	static constexpr float FIRST_WAGON_OFFSET = 2.8f;

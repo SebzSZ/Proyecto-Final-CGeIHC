@@ -47,7 +47,7 @@ int Window::Initialize()
 	glfwMakeContextCurrent(mainWindow);
 
 	// Ocultar el cursor
-	glfwSetInputMode(mainWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetInputMode(mainWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
 	glfwSetWindowUserPointer(mainWindow, this);
 	registerCallbacks();

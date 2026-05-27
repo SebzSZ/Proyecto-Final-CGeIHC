@@ -1,15 +1,17 @@
 #include "Castle.h"
+#include "PointLight.h"
 
 Castle::Castle() : castleObj(nullptr)
 {}
 
-bool Castle::Initialize(Material& matOpaco)
+bool Castle::Initialize(Material& matOpaco, PointLight* pointLights, unsigned int& pointLightCount)
 {
 	if (!mainRoomModel.load("Models/HyruleCastle_MainRoom.obj")) return false;
 	if (!bigTowerModel.load("Models/HyruleCastle_BigTower.obj")) return false;
 	if (!wallModel.load("Models/HyruleCastle_Wall.obj")) return false;
 	if (!midTowerModel.load("Models/HyruleCastle_MidTower.obj")) return false;
 	if (!floorModel.load("Models/HyruleCastle_Floor.obj")) return false;
+	if (!torchModel.load("Models/Torch.obj")) return false;
 
 	// Container
 	castleObj = std::make_shared<GameObject>("Castle Container");
@@ -188,5 +190,74 @@ bool Castle::Initialize(Material& matOpaco)
 	floor4Obj->transform.setScale(60.0f, 1.0f, 31.1f);
 	castleObj->addChild(floor4Obj);
 
-	return true; // Éxito al cargar
+	CreateTorches(matOpaco, pointLights, pointLightCount);
+
+	return true;
+}
+
+void Castle::CreateTorches(Material& matOpaco, PointLight* pointLights, unsigned int& pointLightCount)
+{
+	std::shared_ptr<GameObject> container = std::make_shared<GameObject>("Torches", GameObjectType::MODEL);
+
+	std::shared_ptr<GameObject> torchObj1 = std::make_shared<GameObject>("Torch", GameObjectType::MODEL);
+	torchObj1->setModel(&torchModel);
+	torchObj1->setMaterial(&matOpaco);
+	torchObj1->transform.setPosition(6.38f, 2.85f, 0.03f);
+	torchObj1->transform.setRotation(0.0f, 90.0f, 0.0f);
+	torchObj1->transform.setScale(0.5f);
+
+	std::shared_ptr<GameObject> lightObj1 = std::make_shared<GameObject>("TorchLight1", GameObjectType::POINT_LIGHT);
+	pointLights[pointLightCount] = PointLight(1.0f, 0.5f, 0.0f, 0.2f, 1.0f, 0.0f, 1.15f, 0.0f, 1.0f, 0.7f, 1.8f);
+	lightObj1->setPointLight(&pointLights[pointLightCount++]);
+	lightObj1->transform.setPosition(0.0f, 1.15f, 0.0f);
+	torchObj1->addChild(lightObj1);
+
+	container->addChild(torchObj1);
+
+	std::shared_ptr<GameObject> torchObj2 = std::make_shared<GameObject>("Torch", GameObjectType::MODEL);
+	torchObj2->setModel(&torchModel);
+	torchObj2->setMaterial(&matOpaco);
+	torchObj2->transform.setPosition(32.9f, 2.85f, 0.03f);
+	torchObj2->transform.setRotation(0.0f, 90.0f, 0.0f);
+	torchObj2->transform.setScale(0.5f);
+
+	std::shared_ptr<GameObject> lightObj2 = std::make_shared<GameObject>("TorchLight2", GameObjectType::POINT_LIGHT);
+	pointLights[pointLightCount] = PointLight(1.0f, 0.5f, 0.0f, 0.2f, 1.0f, 0.0f, 1.15f, 0.0f, 1.0f, 0.7f, 1.8f);
+	lightObj2->setPointLight(&pointLights[pointLightCount++]);
+	lightObj2->transform.setPosition(0.0f, 1.15f, 0.0f);
+	torchObj2->addChild(lightObj2);
+
+	container->addChild(torchObj2);
+
+	std::shared_ptr<GameObject> torchObj3 = std::make_shared<GameObject>("Torch", GameObjectType::MODEL);
+	torchObj3->setModel(&torchModel);
+	torchObj3->setMaterial(&matOpaco);
+	torchObj3->transform.setPosition(24.0f, 1.85f, 5.57f);
+	torchObj3->transform.setRotation(0.0f, 135.0f, 0.0f);
+	torchObj3->transform.setScale(0.5f);
+
+	std::shared_ptr<GameObject> lightObj3 = std::make_shared<GameObject>("TorchLight3", GameObjectType::POINT_LIGHT);
+	pointLights[pointLightCount] = PointLight(1.0f, 0.5f, 0.0f, 0.2f, 1.0f, 0.0f, 1.15f, 0.0f, 1.0f, 0.7f, 1.8f);
+	lightObj3->setPointLight(&pointLights[pointLightCount++]);
+	lightObj3->transform.setPosition(0.0f, 1.15f, 0.0f);
+	torchObj3->addChild(lightObj3);
+
+	container->addChild(torchObj3);
+
+	std::shared_ptr<GameObject> torchObj4 = std::make_shared<GameObject>("Torch", GameObjectType::MODEL);
+	torchObj4->setModel(&torchModel);
+	torchObj4->setMaterial(&matOpaco);
+	torchObj4->transform.setPosition(16.06f, 1.85f, 5.57f);
+	torchObj4->transform.setRotation(0.0f, 47.21f, 0.0f);
+	torchObj4->transform.setScale(0.5f);
+
+	std::shared_ptr<GameObject> lightObj4 = std::make_shared<GameObject>("TorchLight4", GameObjectType::POINT_LIGHT);
+	pointLights[pointLightCount] = PointLight(1.0f, 0.5f, 0.0f, 0.2f, 1.0f, 0.0f, 1.15f, 0.0f, 1.0f, 0.7f, 1.8f);
+	lightObj4->setPointLight(&pointLights[pointLightCount++]);
+	lightObj4->transform.setPosition(0.0f, 1.15f, 0.0f);
+	torchObj4->addChild(lightObj4);
+
+	container->addChild(torchObj4);
+
+	castleObj->addChild(container);
 }
