@@ -10,7 +10,7 @@ in vec4 VertexColor;
 out vec4 fragColor;
 
 // Constantes para la iluminación
-const int MAX_POINT_LIGHTS = 3;
+const int MAX_POINT_LIGHTS = 8;
 const int MAX_SPOT_LIGHTS = 3;
 
 // Estructuras para las luces
